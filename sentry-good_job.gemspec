@@ -13,7 +13,20 @@ Gem::Specification.new do |spec|
   spec.platform = Gem::Platform::RUBY
   spec.required_ruby_version = ">= 2.4"
   spec.extra_rdoc_files = ["README.md", "LICENSE.txt"]
-  spec.files = `git ls-files | grep -Ev '^(spec|benchmarks|examples|\.rubocop\.yml)'`.split("\n")
+  spec.files = Dir.chdir(File.expand_path(__dir__)) do
+    Dir[
+      "lib/**/*",
+      "bin/*",
+      "CHANGELOG.md",
+      "README.md",
+      "LICENSE.txt",
+      "CODE_OF_CONDUCT.md",
+      "CONTRIBUTING.md",
+      "GOVERNANCE.md",
+      "SECURITY.md",
+      "sentry-good_job.gemspec"
+    ].select { |path| File.file?(path) }
+  end
 
   github_root_uri = "https://github.com/amkisko/sentry-good_job"
   spec.homepage = "#{github_root_uri}/tree/#{spec.version}/#{spec.name}"
@@ -30,6 +43,6 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "sentry-ruby", "~> 6.2.0"
-  spec.add_dependency "good_job", ">= 3.0"
+  spec.add_dependency "sentry-ruby", "~> 6"
+  spec.add_dependency "good_job", "~> 4"
 end
