@@ -53,8 +53,6 @@ module Sentry
         setup_good_job_extensions
       end
 
-      private
-
       def self.enhance_sentry_reporter
         return if defined?(@reporter_enhanced) && @reporter_enhanced
 
@@ -88,6 +86,8 @@ module Sentry
         end
       end
 
+      private_class_method :enhance_sentry_reporter, :setup_good_job_extensions
+
       # GoodJob-specific extensions for ActiveJob
       module GoodJobExtensions
         extend ActiveSupport::Concern
@@ -116,7 +116,7 @@ module Sentry
 
           # Call the base implementation if it exists (from sentry-rails)
           if respond_to?(:_sentry_set_span_data, true) && method(:_sentry_set_span_data).super_method
-            super(span, job, retry_count: retry_count)
+            super
           else
             # Fallback: implement base functionality directly
             span.set_data("messaging.message.id", job.job_id)

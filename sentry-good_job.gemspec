@@ -3,19 +3,19 @@
 require_relative "lib/sentry/good_job/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "sentry-good_job"
-  spec.version       = Sentry::GoodJob::VERSION
+  spec.name = "sentry-good_job"
+  spec.version = Sentry::GoodJob::VERSION
   spec.authors = ["Sentry Team", "Andrei Makarov"]
   spec.description = spec.summary = "A gem that provides Good Job integration for the Sentry error logger"
   spec.email = "contact@kiskolabs.com"
-  spec.license = 'MIT'
+  spec.license = "MIT"
 
   spec.platform = Gem::Platform::RUBY
-  spec.required_ruby_version = '>= 2.4'
+  spec.required_ruby_version = ">= 2.4"
   spec.extra_rdoc_files = ["README.md", "LICENSE.txt"]
   spec.files = `git ls-files | grep -Ev '^(spec|benchmarks|examples|\.rubocop\.yml)'`.split("\n")
 
-  github_root_uri = 'https://github.com/amkisko/sentry-good_job'
+  github_root_uri = "https://github.com/amkisko/sentry-good_job"
   spec.homepage = "#{github_root_uri}/tree/#{spec.version}/#{spec.name}"
 
   spec.metadata = {
@@ -26,8 +26,8 @@ Gem::Specification.new do |spec|
     "documentation_uri" => "http://www.rubydoc.info/gems/#{spec.name}/#{spec.version}"
   }
 
-  spec.bindir        = "exe"
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.bindir = "exe"
+  spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
   spec.add_dependency "sentry-ruby", "~> 6.2.0"

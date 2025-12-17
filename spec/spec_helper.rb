@@ -17,7 +17,7 @@ require "sentry/test_helper"
 # . `<module:LoggerThreadSafeLevel>': uninitialized constant ActiveSupport::LoggerThreadSafeLevel::Logger (NameError)
 require "logger"
 
-require 'simplecov'
+require "simplecov"
 
 SimpleCov.start do
   project_name "sentry-good_job"
@@ -26,13 +26,13 @@ SimpleCov.start do
 end
 
 if ENV["CI"]
-  require 'simplecov-cobertura'
+  require "simplecov-cobertura"
   SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
 end
 
 require "sentry-good_job"
 
-DUMMY_DSN = 'http://12345:67890@sentry.localdomain/sentry/42'
+DUMMY_DSN = "http://12345:67890@sentry.localdomain/sentry/42"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -53,18 +53,18 @@ RSpec.configure do |config|
     puts "\n"
   end
 
-  config.before :each do
+  config.before do
     # Make sure we reset the env in case something leaks in
-    ENV.delete('SENTRY_DSN')
-    ENV.delete('SENTRY_CURRENT_ENV')
-    ENV.delete('SENTRY_ENVIRONMENT')
-    ENV.delete('SENTRY_RELEASE')
-    ENV.delete('RACK_ENV')
+    ENV.delete("SENTRY_DSN")
+    ENV.delete("SENTRY_CURRENT_ENV")
+    ENV.delete("SENTRY_ENVIRONMENT")
+    ENV.delete("SENTRY_RELEASE")
+    ENV.delete("RACK_ENV")
   end
 
   config.include(Sentry::TestHelper)
 
-  config.after :each do
+  config.after do
     reset_sentry_globals!
   end
 end
@@ -99,35 +99,37 @@ rescue RuntimeError => e
   e
 end
 
-class HappyJob < ActiveJob::Base
+class ApplicationJob < ActiveJob::Base; end
+
+class HappyJob < ApplicationJob
   def perform
     crumb = Sentry::Breadcrumb.new(message: "I'm happy!")
     Sentry.add_breadcrumb(crumb)
-    Sentry.set_tags mood: 'happy'
+    Sentry.set_tags mood: "happy"
   end
 end
 
-class SadJob < ActiveJob::Base
+class SadJob < ApplicationJob
   def perform
     crumb = Sentry::Breadcrumb.new(message: "I'm sad!")
     Sentry.add_breadcrumb(crumb)
-    Sentry.set_tags mood: 'sad'
+    Sentry.set_tags mood: "sad"
 
     raise "I'm sad!"
   end
 end
 
-class VerySadJob < ActiveJob::Base
+class VerySadJob < ApplicationJob
   def perform
     crumb = Sentry::Breadcrumb.new(message: "I'm very sad!")
     Sentry.add_breadcrumb(crumb)
-    Sentry.set_tags mood: 'very sad'
+    Sentry.set_tags mood: "very sad"
 
     raise "I'm very sad!"
   end
 end
 
-class ReportingJob < ActiveJob::Base
+class ReportingJob < ApplicationJob
   def perform
     Sentry.capture_message("I have something to say!")
   end
@@ -135,15 +137,17 @@ end
 
 class HappyJobWithCron < HappyJob
   include Sentry::Cron::MonitorCheckIns
+
   sentry_monitor_check_ins
 end
 
 class SadJobWithCron < SadJob
   include Sentry::Cron::MonitorCheckIns
+
   sentry_monitor_check_ins slug: "failed_job", monitor_config: Sentry::Cron::MonitorConfig.from_crontab("5 * * * *")
 end
 
-class WorkloadJob < ActiveJob::Base
+class WorkloadJob < ApplicationJob
   def perform
     # Create some CPU work that should show up in the profile
     calculate_fibonacci(25)
@@ -168,7 +172,6 @@ class WorkloadJob < ActiveJob::Base
   def generate_strings
     # Memory and CPU work
     100.times do |i|
-      "test string #{i}" * 100
       Math.sqrt(i * 1000)
     end
   end

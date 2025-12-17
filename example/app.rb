@@ -9,7 +9,7 @@ require "good_job"
 Sentry.init do |config|
   config.dsn = ENV["SENTRY_DSN"] || "http://12345:67890@sentry.localdomain/sentry/42"
   config.environment = "development"
-  config.logger = Logger.new(STDOUT)
+  config.logger = Logger.new($stdout)
 
   # Good Job specific configuration
   # Logging is now handled by the standard Sentry SDK logger
@@ -19,24 +19,27 @@ Sentry.init do |config|
   config.send_default_pii = true  # Include job arguments
 end
 
+# Align with Rails conventions for jobs
+class ApplicationJob < ActiveJob::Base; end
+
 # Example job classes
-class HappyJob < ActiveJob::Base
+class HappyJob < ApplicationJob
   def perform(message)
     puts "Happy job executed with message: #{message}"
     Sentry.add_breadcrumb(message: "Happy job completed successfully")
   end
 end
 
-class SadJob < ActiveJob::Base
+class SadJob < ApplicationJob
   def perform(message)
     puts "Sad job executed with message: #{message}"
     raise "Something went wrong in the sad job!"
   end
 end
 
-class ScheduledJob < ActiveJob::Base
+class ScheduledJob < ApplicationJob
   def perform
-    puts "Scheduled job executed at #{Time.now}"
+    puts "Scheduled job executed at #{Time.current}"
   end
 end
 

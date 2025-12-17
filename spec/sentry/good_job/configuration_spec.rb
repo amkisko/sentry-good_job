@@ -11,7 +11,7 @@ RSpec.describe Sentry::GoodJob::Configuration do
 
   describe "default values" do
     it "sets default values correctly" do
-      expect(config.enable_cron_monitors).to eq(true)
+      expect(config.enable_cron_monitors).to be(true)
     end
   end
 
@@ -33,7 +33,7 @@ RSpec.describe Sentry::GoodJob::Configuration do
 
     it "allows setting enable_cron_monitors" do
       config.enable_cron_monitors = false
-      expect(config.enable_cron_monitors).to eq(false)
+      expect(config.enable_cron_monitors).to be(false)
     end
   end
 end

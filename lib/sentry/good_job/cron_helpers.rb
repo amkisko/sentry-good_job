@@ -50,10 +50,10 @@ module Sentry
           # - UTC offsets (UTC+2, UTC-5, GMT+1, GMT-8)
           # - Numeric timezones (GMT-5, UTC+2)
           if timezone.match?(/^[A-Za-z_]+$/) || # Simple timezone names (UTC, GMT, EST, etc.)
-             timezone.match?(/^[A-Za-z_]+\/[A-Za-z_]+$/) || # Single slash timezones (Europe/Stockholm)
-             timezone.match?(/^[A-Za-z_]+\/[A-Za-z_]+\/[A-Za-z_]+$/) || # Multi-slash timezones (America/Argentina/Buenos_Aires)
-             timezone.match?(/^[A-Za-z_]+[+-]\d+$/) || # UTC/GMT offsets (UTC+2, GMT-5)
-             timezone.match?(/^[A-Za-z_]+\/[A-Za-z_]+[+-]\d+$/) # IANA with offset (Europe/Stockholm+1)
+              timezone.match?(/^[A-Za-z_]+\/[A-Za-z_]+$/) || # Single slash timezones (Europe/Stockholm)
+              timezone.match?(/^[A-Za-z_]+\/[A-Za-z_]+\/[A-Za-z_]+$/) || # Multi-slash timezones (America/Argentina/Buenos_Aires)
+              timezone.match?(/^[A-Za-z_]+[+-]\d+$/) || # UTC/GMT offsets (UTC+2, GMT-5)
+              timezone.match?(/^[A-Za-z_]+\/[A-Za-z_]+[+-]\d+$/) # IANA with offset (Europe/Stockholm+1)
             cron_without_timezone = cron_expression.gsub(/\s+#{Regexp.escape(timezone)}$/, "")
             [cron_without_timezone, timezone]
           else
@@ -78,7 +78,7 @@ module Sentry
 
           return unless defined?(::Rails) && ::Rails.respond_to?(:application) && ::Rails.application
           cron_config = ::Rails.application.config.good_job.cron
-          return unless cron_config.present?
+          return if cron_config.blank?
 
           added_jobs = []
           cron_config.each do |cron_key, job_config|

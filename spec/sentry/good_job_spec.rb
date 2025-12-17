@@ -16,7 +16,7 @@ RSpec.describe Sentry::GoodJob do
   end
 
   it "has the correct version" do
-    expect(described_class::VERSION).to eq("5.28.0")
+    expect(described_class::VERSION).to eq("6.2.0")
   end
 
   describe "setup_good_job_integration" do
@@ -34,15 +34,19 @@ RSpec.describe Sentry::GoodJob do
 
     it "does not automatically set up job monitoring for any specific job class" do
       # The integration now only sets up cron monitoring, not custom job monitoring
-      expect(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
+      allow(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
 
       described_class.setup_good_job_integration
+
+      expect(Sentry::GoodJob::CronHelpers::Integration).to have_received(:setup_monitoring_for_scheduled_jobs)
     end
 
     it "sets up cron monitoring when enabled" do
-      expect(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
+      allow(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
 
       described_class.setup_good_job_integration
+
+      expect(Sentry::GoodJob::CronHelpers::Integration).to have_received(:setup_monitoring_for_scheduled_jobs)
     end
 
     context "when enable_cron_monitors is enabled" do
@@ -51,9 +55,11 @@ RSpec.describe Sentry::GoodJob do
       end
 
       it "sets up cron monitoring" do
-        expect(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
+        allow(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
 
         described_class.setup_good_job_integration
+
+        expect(Sentry::GoodJob::CronHelpers::Integration).to have_received(:setup_monitoring_for_scheduled_jobs)
       end
     end
 
@@ -63,9 +69,11 @@ RSpec.describe Sentry::GoodJob do
       end
 
       it "does not set up cron monitoring" do
-        expect(Sentry::GoodJob::CronHelpers::Integration).not_to receive(:setup_monitoring_for_scheduled_jobs)
+        allow(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
 
         described_class.setup_good_job_integration
+
+        expect(Sentry::GoodJob::CronHelpers::Integration).not_to have_received(:setup_monitoring_for_scheduled_jobs)
       end
     end
   end
@@ -73,11 +81,13 @@ RSpec.describe Sentry::GoodJob do
   describe "capture_exception" do
     it "delegates to Sentry.capture_exception" do
       exception = build_exception
-      options = { hint: { background: true } }
+      options = {hint: {background: true}}
 
-      expect(Sentry).to receive(:capture_exception).with(exception, **options)
+      allow(Sentry).to receive(:capture_exception)
 
       described_class.capture_exception(exception, **options)
+
+      expect(Sentry).to have_received(:capture_exception).with(exception, **options)
     end
   end
 
