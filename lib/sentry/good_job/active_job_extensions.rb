@@ -80,7 +80,6 @@ module Sentry
           # Ensure the sentry-rails integration is properly set up
           # by checking if the ActiveJobExtensions module is already included
           if defined?(::Sentry::Rails::ActiveJobExtensions) && !ancestors.include?(::Sentry::Rails::ActiveJobExtensions)
-            require "sentry/rails/active_job"
             prepend ::Sentry::Rails::ActiveJobExtensions
           end
         end
