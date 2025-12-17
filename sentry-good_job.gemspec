@@ -6,7 +6,8 @@ Gem::Specification.new do |spec|
   spec.name = "sentry-good_job"
   spec.version = Sentry::GoodJob::VERSION
   spec.authors = ["Sentry Team", "Andrei Makarov"]
-  spec.description = spec.summary = "A gem that provides Good Job integration for the Sentry error logger"
+  spec.summary = "GoodJob integration for the Sentry error logger"
+  spec.description = "Adds Sentry instrumentation, context helpers, and cron monitoring support to GoodJob-backed ActiveJob workloads."
   spec.email = "contact@kiskolabs.com"
   spec.license = "MIT"
 
@@ -29,12 +30,12 @@ Gem::Specification.new do |spec|
   end
 
   github_root_uri = "https://github.com/amkisko/sentry-good_job"
-  spec.homepage = "#{github_root_uri}/tree/#{spec.version}/#{spec.name}"
+  spec.homepage = github_root_uri
 
   spec.metadata = {
     "homepage_uri" => spec.homepage,
-    "source_code_uri" => spec.homepage,
-    "changelog_uri" => "#{github_root_uri}/blob/#{spec.version}/CHANGELOG.md",
+    "source_code_uri" => "#{github_root_uri}/tree/main",
+    "changelog_uri" => "#{github_root_uri}/blob/main/CHANGELOG.md",
     "bug_tracker_uri" => "#{github_root_uri}/issues",
     "documentation_uri" => "http://www.rubydoc.info/gems/#{spec.name}/#{spec.version}"
   }
