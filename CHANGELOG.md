@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.2.1
+
+- Relax dependencies to allow all current versions of sentry-ruby and good_job
+
 ## 6.2.0
 
 ### Features
