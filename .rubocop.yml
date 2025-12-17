@@ -9,7 +9,6 @@ plugins:
   - standard-custom
   - standard-performance
   - rubocop-performance
-  - rubocop-rails
   - rubocop-rspec
   - rubocop-thread_safety
 
@@ -17,7 +16,6 @@ inherit_gem:
   standard: config/base.yml
   standard-performance: config/base.yml
   standard-custom: config/base.yml
-  standard-rails: config/base.yml
 
 AllCops:
   SuggestExtensions: false
@@ -68,22 +66,11 @@ RSpec/VerifiedDoubles:
 Style/AccessModifierDeclarations:
   EnforcedStyle: inline
 
-Rails/ActiveRecordCallbacksOrder:
-  Enabled: false
-
 Style/FrozenStringLiteralComment:
   Enabled: false
 
 Lint/UselessAssignment:
   Enabled: false
-
-Rails/Exit:
-  Exclude:
-    - usr/**/*
-
-Rails/TimeZone:
-  Exclude:
-    - spec/**/*
 
 ThreadSafety/ClassAndModuleAttributes:
   Enabled: false
@@ -101,18 +88,5 @@ Lint/Debugger:
   Exclude: []
 
 RSpec/Focus:
-  Enabled: true
-  Exclude: []
-
-Rails/Output:
-  Enabled: true
-  Exclude:
-    - usr/**/*
-
-Rails/FindEach:
-  Enabled: true
-  Exclude: []
-
-Rails/UniqBeforePluck:
   Enabled: true
   Exclude: []

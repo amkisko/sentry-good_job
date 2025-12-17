@@ -193,12 +193,6 @@ GEM
       lint_roller (~> 1.1)
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.38.0, < 2.0)
-    rubocop-rails (2.33.4)
-      activesupport (>= 4.2.0)
-      lint_roller (~> 1.1)
-      rack (>= 1.1)
-      rubocop (>= 1.75.0, < 2.0)
-      rubocop-ast (>= 1.44.0, < 2.0)
     rubocop-rspec (3.8.0)
       lint_roller (~> 1.1)
       rubocop (~> 1.81)
@@ -236,9 +230,6 @@ GEM
     standard-performance (1.8.0)
       lint_roller (~> 1.1)
       rubocop-performance (~> 1.25.0)
-    standard-rails (1.5.0)
-      lint_roller (~> 1.0)
-      rubocop-rails (~> 2.33.4)
     standard-rspec (0.3.1)
       lint_roller (>= 1.0)
       rubocop-capybara (~> 2.22)
@@ -273,7 +264,6 @@ DEPENDENCIES
   rake (~> 13.0)
   rspec (~> 3.0)
   rubocop (~> 1.0)
-  rubocop-rails (~> 2.33.4)
   rubocop-rspec (~> 3.8.0)
   rubocop-thread_safety (~> 0.7.3)
   sentry-good_job!
@@ -282,7 +272,6 @@ DEPENDENCIES
   standard (~> 1.52.0)
   standard-custom (~> 1.0.2)
   standard-performance (~> 1.8.0)
-  standard-rails (~> 1.5.0)
   standard-rspec (~> 0.3.1)
 
 BUNDLED WITH

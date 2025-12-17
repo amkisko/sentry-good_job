@@ -49,10 +49,8 @@ lint:
       extra_packages:
         - standard@1.52.0
         - standard-custom@1.0.2
-        - standard-rails@1.5.0
         - standard-performance@1.8.0
         - standard-rspec@0.3.1
-        - rubocop-rails@2.34.2
         - rubocop-rspec@3.8.0
         - rubocop-thread_safety@0.7.3
         - rubocop-performance@1.26.0
