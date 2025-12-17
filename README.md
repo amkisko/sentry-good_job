@@ -10,14 +10,13 @@
 ---
 
 [![Gem Version](https://img.shields.io/gem/v/sentry-good_job.svg)](https://rubygems.org/gems/sentry-good_job)
-![Build Status](https://github.com/getsentry/sentry-ruby/actions/workflows/sentry_good_job_test.yml/badge.svg)
-[![Coverage Status](https://img.shields.io/codecov/c/github/getsentry/sentry-ruby/master?logo=codecov)](https://codecov.io/gh/getsentry/sentry-ruby/branch/master)
+[![Build Status](https://github.com/amkisko/sentry-good_job/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/amkisko/sentry-good_job/actions/workflows/test.yml)
+[![Coverage Status](https://img.shields.io/codecov/c/github/amkisko/sentry-good_job/main?logo=codecov)](https://app.codecov.io/gh/amkisko/sentry-good_job)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=amkisko_sentry-good_job&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=amkisko_sentry-good_job)
 [![Gem](https://img.shields.io/gem/dt/sentry-good_job.svg)](https://rubygems.org/gems/sentry-good_job/)
 [![SemVer](https://api.dependabot.com/badges/compatibility_score?dependency-name=sentry-good_job&package-manager=bundler&version-scheme=semver)](https://dependabot.com/compatibility-score.html?dependency-name=sentry-good_job&package-manager=bundler&version-scheme=semver)
 
-[Documentation](https://docs.sentry.io/platforms/ruby/guides/good_job/) | [Bug Tracker](https://github.com/getsentry/sentry-ruby/issues) | [Forum](https://forum.sentry.io/) | IRC: irc.freenode.net, #sentry
-
-The official Ruby-language client and integration layer for the [Sentry](https://github.com/getsentry/sentry) error reporting API.
+This gem provides the GoodJob integration for the [Sentry](https://sentry.io) Ruby SDK.
 
 ## Getting Started
 
@@ -191,12 +190,12 @@ The integration automatically adds relevant context to error reports:
 
 - Ruby 2.4+
 - Rails 5.2+
-- Good Job 3.0+
-- Sentry Ruby SDK 5.28.0+
+- Good Job 4.x
+- Sentry Ruby SDK 6.x
 
 ## Contributing
 
-We welcome contributions! Please see our [contributing guidelines](https://github.com/getsentry/sentry-ruby/blob/master/CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [contributing guidelines](./CONTRIBUTING.md) for details.
 
 ## License
 
