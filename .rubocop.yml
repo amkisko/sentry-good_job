@@ -81,6 +81,10 @@ Rails/Exit:
   Exclude:
     - usr/**/*
 
+Rails/TimeZone:
+  Exclude:
+    - spec/**/*
+
 ThreadSafety/ClassAndModuleAttributes:
   Enabled: false
 
