@@ -6,6 +6,24 @@ begin
 rescue LoadError
 end
 
+require "simplecov"
+require "simplecov-cobertura"
+require "simplecov_json_formatter"
+
+SimpleCov.start do
+  root File.expand_path("..", __dir__)
+  coverage_dir File.join(root, "coverage")
+  track_files "lib/**/*.rb"
+  add_filter "/spec/"
+
+  formatters = [
+    SimpleCov::Formatter::HTMLFormatter,
+    SimpleCov::Formatter::JSONFormatter
+  ]
+  formatters << SimpleCov::Formatter::CoberturaFormatter if ENV["CI"]
+  formatter SimpleCov::Formatter::MultiFormatter.new(formatters)
+end
+
 require "active_job"
 require "good_job"
 
@@ -16,19 +34,6 @@ require "sentry/test_helper"
 # activesupport-6.1.7.10/lib/active_support/logger_thread_safe_level.rb:16:in
 # . `<module:LoggerThreadSafeLevel>': uninitialized constant ActiveSupport::LoggerThreadSafeLevel::Logger (NameError)
 require "logger"
-
-require "simplecov"
-
-SimpleCov.start do
-  project_name "sentry-good_job"
-  root File.join(__FILE__, "../../../")
-  coverage_dir File.join(__FILE__, "../../coverage")
-end
-
-if ENV["CI"]
-  require "simplecov-cobertura"
-  SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
-end
 
 require "sentry-good_job"
 
