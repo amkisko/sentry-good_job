@@ -14,5 +14,3 @@ appraise "truffleruby" do
   # Use TruffleRuby engine in CI/environment; the ruby directive helps bundler select engine
   ruby ">= 3.2.0"
 end
-
-
