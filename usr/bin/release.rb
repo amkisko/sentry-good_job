@@ -15,7 +15,7 @@ def execute_command(command)
 end
 
 execute_command("bundle")
-# execute_command("bundle exec appraisal generate")
+execute_command("bundle exec appraisal generate")
 execute_command("bundle exec rubocop -a 2>&1 | tee tmp/rubocop.log")
 # execute_command("bundle exec rbs validate")
 execute_command("bundle exec rspec 2>&1 | tee tmp/rspec.log")

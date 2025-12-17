@@ -55,6 +55,7 @@ lint:
         - rubocop-rails@2.34.2
         - rubocop-rspec@3.8.0
         - rubocop-thread_safety@0.7.3
+        - rubocop-performance@1.26.0
   ignore:
     - linters: [ALL]
       paths:

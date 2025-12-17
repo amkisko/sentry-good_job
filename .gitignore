@@ -79,3 +79,5 @@ node_modules/
 
 # RSpec status file
 .rspec_status
+
+gemfiles/*.lock
