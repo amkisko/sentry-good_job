@@ -15,6 +15,7 @@ SimpleCov.start do
   coverage_dir File.join(root, "coverage")
   track_files "lib/**/*.rb"
   add_filter "/spec/"
+  add_filter "/lib/sentry/good_job/version.rb"
 
   formatters = [
     SimpleCov::Formatter::HTMLFormatter,
