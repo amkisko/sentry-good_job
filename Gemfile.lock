@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     sentry-good_job (6.2.0)
-      good_job (~> 4)
-      sentry-ruby (~> 6)
+      good_job (>= 3.0)
+      sentry-ruby (>= 6.0)
 
 GEM
   remote: https://rubygems.org/
