@@ -1,0 +1,89 @@
+# This file controls the behavior of Trunk: https://docs.trunk.io/cli
+# To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
+version: 0.1
+cli:
+  version: 1.25.0
+# Trunk provides extensibility via plugins. (https://docs.trunk.io/plugins)
+plugins:
+  sources:
+    - id: trunk
+      ref: v1.7.4
+      uri: https://github.com/trunk-io/plugins
+# Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
+# downloads:
+#   - name: custom-ruby-build
+#     version: 20241105
+#     downloads:
+#       - os:
+#           linux: linux
+#           macos: macos
+#         url: https://github.com/rbenv/ruby-build/archive/refs/tags/v20241105.tar.gz
+#         strip_components: 1
+runtimes:
+  # definitions:
+  #   - type: ruby
+  #     download: custom-ruby-build
+  enabled:
+    - go@1.21.0
+    - node@22.16.0
+    - python@3.10.8
+    - ruby@>=3.3.0
+# This is the section where you manage your linters. (https://docs.trunk.io/check/configuration)
+lint:
+  disabled:
+    - brakeman
+    - rufo
+    - eslint
+    - prettier
+    - standardrb
+    - semgrep
+    - oxipng
+    - svgo
+    - trufflehog
+    - shfmt
+    - hadolint
+  definitions:
+    - name: stylelint
+      files: [css]
+    - name: rubocop
+      extra_packages:
+        - standard@1.52.0
+        - standard-custom@1.0.2
+        - standard-rails@1.5.0
+        - standard-performance@1.8.0
+        - standard-rspec@0.3.1
+        - rubocop-rails@2.34.2
+        - rubocop-rspec@3.8.0
+        - rubocop-thread_safety@0.7.3
+  ignore:
+    - linters: [ALL]
+      paths:
+        - bin/**
+        - db/schema.rb
+        - vendor/**
+        - tmp/**
+        - log/**
+        - storage/**
+        - coverage/**
+        - uploads/**
+  enabled:
+    - biome@2.3.8
+    - rubocop@1.81.7
+    - stylelint@16.26.1
+    - yamllint@1.37.1
+    - gitleaks@8.29.0
+    - actionlint@1.7.8
+    - checkov@3.2.495
+    - dotenv-linter@4.0.0
+    - git-diff-check
+    - markdownlint@0.46.0
+    - osv-scanner@2.2.4
+    - shellcheck@0.11.0
+    - trivy@0.67.2
+actions:
+  disabled:
+    - trunk-announce
+    - trunk-check-pre-push
+    - trunk-fmt-pre-commit
+  enabled:
+    - trunk-upgrade-available
