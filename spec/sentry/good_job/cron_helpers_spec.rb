@@ -370,5 +370,23 @@ RSpec.describe Sentry::GoodJob::CronHelpers do
         expect(Sentry.configuration.sdk_logger).to have_received(:info).with(/Added Sentry cron monitoring/)
       end
     end
+
+    describe ".attach_reload_hook_if_available" do
+      it "resets setup state on reload when ActiveSupport::Reloader is present" do
+        reloader = Class.new do
+          def self.to_prepare(&block)
+            block.call
+          end
+        end
+        stub_const("ActiveSupport::Reloader", reloader)
+
+        described_class::Integration.instance_variable_set(:@setup_completed, true)
+        described_class::Integration.instance_variable_set(:@reload_hooked, false)
+
+        described_class::Integration.attach_reload_hook_if_available
+
+        expect(described_class::Integration.instance_variable_get(:@setup_completed)).to be(false)
+      end
+    end
   end
 end

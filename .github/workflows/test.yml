@@ -45,7 +45,7 @@ jobs:
         with:
           ruby-version: "3.4"
           bundler-cache: true
-      - run: bundle exec rspec
+      - run: bundle exec appraisal rails8 rspec
       - uses: codecov/codecov-action@v5
         continue-on-error: true
         env:
