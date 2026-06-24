@@ -26,7 +26,7 @@ jobs:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/${{ matrix.gemfile }}.gemfile
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
@@ -42,17 +42,17 @@ jobs:
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/rails8.gemfile
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
           bundler-cache: true
       - run: bundle exec rspec
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7
         continue-on-error: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7
         if: ${{ !cancelled() }}
         continue-on-error: true
         with:
