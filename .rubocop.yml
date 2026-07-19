@@ -90,3 +90,22 @@ Lint/Debugger:
 RSpec/Focus:
   Enabled: true
   Exclude: []
+
+Metrics/ModuleLength:
+  Enabled: true
+  CountAsOne: [array, hash, heredoc, method_call]
+  Max: 150
+Metrics/ClassLength:
+  Enabled: true
+  CountAsOne: [array, hash, heredoc, method_call]
+  Max: 150
+Metrics/CyclomaticComplexity:
+  Enabled: true
+  Max: 10
+Metrics/PerceivedComplexity:
+  Enabled: true
+  Max: 10
+Metrics/AbcSize:
+  Enabled: true
+  Max: 15
+  CountRepeatedAttributes: false

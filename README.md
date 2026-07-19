@@ -11,8 +11,8 @@
 
 [![Gem Version](https://img.shields.io/gem/v/sentry-good_job.svg)](https://rubygems.org/gems/sentry-good_job)
 [![Build Status](https://github.com/amkisko/sentry-good_job/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/amkisko/sentry-good_job/actions/workflows/test.yml)
-[![Coverage Status](https://img.shields.io/codecov/c/github/amkisko/sentry-good_job/main?logo=codecov)](https://app.codecov.io/gh/amkisko/sentry-good_job)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=amkisko_sentry-good_job&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=amkisko_sentry-good_job)
+[![Coverage Status](https://img.shields.io/codecov/c/github/amkisko/sentry-good_job/main?logo=codecov)](https://app.codecov.io/github/amkisko/sentry-good_job)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=amkisko_sentry-good_job&metric=alert_status)](https://sonarcloud.io/project/overview?id=amkisko_sentry-good_job)
 [![Gem](https://img.shields.io/gem/dt/sentry-good_job.svg)](https://rubygems.org/gems/sentry-good_job/)
 [![SemVer](https://api.dependabot.com/badges/compatibility_score?dependency-name=sentry-good_job&package-manager=bundler&version-scheme=semver)](https://dependabot.com/compatibility-score.html?dependency-name=sentry-good_job&package-manager=bundler&version-scheme=semver)
 
@@ -196,6 +196,19 @@ The integration automatically adds relevant context to error reports:
 ## Contributing
 
 We welcome contributions! Please see our [contributing guidelines](./CONTRIBUTING.md) for details.
+
+## Links
+
+- [GitHub](https://github.com/amkisko/sentry-good_job)
+- [GitLab](https://gitlab.com/amkisko/sentry-good_job)
+- [RubyGems](https://rubygems.org/gems/sentry-good_job)
+- [Versions Atom](https://rubygems.org/gems/sentry-good_job/versions.atom) (feed id `10143542922948`)
+- [libraries.io](https://libraries.io/rubygems/sentry-good_job)
+- [Deps.dev](https://deps.dev/rubygems/sentry-good_job)
+- [SonarCloud](https://sonarcloud.io/project/overview?id=amkisko_sentry-good_job)
+- [Snyk](https://snyk.io/test/github/amkisko/sentry-good_job)
+- [Codecov](https://app.codecov.io/github/amkisko/sentry-good_job)
+- [OpenSSF Scorecard](https://scorecard.dev/viewer/?uri=github.com/amkisko/sentry-good_job)
 
 ## License
 

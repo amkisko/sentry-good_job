@@ -13,14 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - gemfile: ruby31
-            ruby_version: "3.1"
-          - gemfile: ruby32
-            ruby_version: "3.2"
           - gemfile: ruby34
             ruby_version: "3.4"
-          - gemfile: truffleruby
-            ruby_version: "truffleruby"
 
     env:
       BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/${{ matrix.gemfile }}.gemfile

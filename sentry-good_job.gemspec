@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
 
   spec.platform = Gem::Platform::RUBY
-  spec.required_ruby_version = ">= 2.4"
+  spec.required_ruby_version = ">= 3.4"
   spec.extra_rdoc_files = ["README.md", "LICENSE.txt"]
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
     Dir[
