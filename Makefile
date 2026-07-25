@@ -6,7 +6,7 @@ release:
 lint:
 	bundle exec rubocop
 
-test:
+test: lint
 	bundle exec polyrun parallel-rspec --workers 5 --merge-failures
 	bundle exec rspec spec/integration
 
