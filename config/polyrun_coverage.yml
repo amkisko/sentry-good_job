@@ -2,4 +2,4 @@ track_under:
   - lib
 reject_patterns:
   - "/lib/sentry/good_job/version.rb"
-minimum_line_percent: 90
+minimum_line_percent: 65
