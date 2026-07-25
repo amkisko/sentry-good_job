@@ -1,0 +1,7 @@
+spec/sentry/compatibility_spec.rb
+spec/sentry/good_job/active_job_extensions_spec.rb
+spec/sentry/good_job/configuration_spec.rb
+spec/sentry/good_job/context_helpers_spec.rb
+spec/sentry/good_job/cron_helpers_spec.rb
+spec/sentry/good_job/integration_spec.rb
+spec/sentry/good_job_spec.rb

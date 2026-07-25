@@ -6,23 +6,19 @@ begin
 rescue LoadError
 end
 
-require "simplecov"
-require "simplecov-cobertura"
-require "simplecov_json_formatter"
+polyrun_cov_measure =
+  ENV["POLYRUN_COVERAGE_DISABLE"] != "1" &&
+  %w[1 true yes].include?(ENV["POLYRUN_COVERAGE"]&.to_s&.downcase)
 
-SimpleCov.start do
-  root File.expand_path("..", __dir__)
-  coverage_dir File.join(root, "coverage")
-  track_files "lib/**/*.rb"
-  add_filter "/spec/"
-  add_filter "/lib/sentry/good_job/version.rb"
+if polyrun_cov_measure
+  require "coverage"
+  branch = %w[1 true yes].include?(ENV["POLYRUN_COVERAGE_BRANCHES"]&.to_s&.downcase)
+  ::Coverage.start(lines: true, branches: branch)
+end
 
-  formatters = [
-    SimpleCov::Formatter::HTMLFormatter,
-    SimpleCov::Formatter::JSONFormatter
-  ]
-  formatters << SimpleCov::Formatter::CoberturaFormatter if ENV["CI"]
-  formatter SimpleCov::Formatter::MultiFormatter.new(formatters)
+if polyrun_cov_measure
+  require "polyrun/coverage/rails"
+  Polyrun::Coverage::Rails.start!(root: File.expand_path("..", __dir__))
 end
 
 require "active_job"
@@ -74,6 +70,14 @@ RSpec.configure do |config|
     reset_sentry_globals!
   end
 end
+
+require "polyrun/rspec"
+Polyrun::RSpec.install_sharded_formatter_compat!
+Polyrun::RSpec.install_failure_fragments!
+Polyrun::RSpec.install_worker_ping!
+Polyrun::RSpec.install_example_debug!
+Polyrun::RSpec.install_example_rails_logging!
+Polyrun::RSpec.install_example_timeout!
 
 def build_exception
   1 / 0

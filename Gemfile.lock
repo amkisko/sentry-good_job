@@ -60,7 +60,6 @@ GEM
     crass (1.0.6)
     date (3.4.1)
     diff-lcs (1.6.2)
-    docile (1.4.1)
     drb (2.2.3)
     erb (5.1.1)
     erubi (1.13.1)
@@ -113,6 +112,7 @@ GEM
     parser (3.3.9.0)
       ast (~> 2.4.1)
       racc
+    polyrun (2.2.1)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -155,7 +155,6 @@ GEM
     regexp_parser (2.11.3)
     reline (0.6.2)
       io-console (~> 0.5)
-    rexml (3.4.4)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -169,6 +168,8 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.6)
+    rspec_junit_formatter (0.6.0)
+      rspec-core (>= 2, < 4, != 2.12.0)
     rubocop (1.81.7)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -209,15 +210,6 @@ GEM
     sentry-ruby (6.2.0)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
-    simplecov (0.22.0)
-      docile (~> 1.1)
-      simplecov-html (~> 0.11)
-      simplecov_json_formatter (~> 0.1)
-    simplecov-cobertura (2.1.0)
-      rexml
-      simplecov (~> 0.19)
-    simplecov-html (0.13.2)
-    simplecov_json_formatter (0.1.4)
     standard (1.52.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -260,19 +252,19 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  appraisal (~> 2.0)
+  appraisal (~> 2)
+  bundler (>= 2)
+  polyrun (>= 2.2.0)
   rake (~> 13.0)
-  rspec (~> 3.0)
-  rubocop (~> 1.0)
-  rubocop-rspec (~> 3.8.0)
-  rubocop-thread_safety (~> 0.7.3)
+  rspec (~> 3)
+  rspec_junit_formatter (~> 0.6)
+  rubocop-rspec (~> 3.8)
+  rubocop-thread_safety (~> 0.7)
   sentry-good_job!
-  simplecov (~> 0.22)
-  simplecov-cobertura (~> 2.0)
-  standard (~> 1.52.0)
-  standard-custom (~> 1.0.2)
-  standard-performance (~> 1.8.0)
-  standard-rspec (~> 0.3.1)
+  standard (~> 1.52)
+  standard-custom (~> 1.0)
+  standard-performance (~> 1.8)
+  standard-rspec (~> 0.3)
 
 BUNDLED WITH
    2.5.9

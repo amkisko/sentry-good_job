@@ -1,22 +1,25 @@
-# frozen_string_literal: true
+.PHONY: release lint test clean
 
-.PHONY: test
-test:
-	bundle exec rspec
+release:
+	ruby usr/bin/release.rb
 
-.PHONY: lint
 lint:
 	bundle exec rubocop
 
-.PHONY: install
+test:
+	bundle exec polyrun parallel-rspec --workers 5 --merge-failures
+	bundle exec rspec spec/integration
+
+clean:
+	rm -rf coverage .pray/cache tmp
+	rm -f spec/examples.txt *.gem
+
 install:
 	bundle install
 
-.PHONY: console
 console:
 	bundle exec bin/console
 
-.PHONY: setup
 setup:
 	bundle install
 	bundle exec bin/setup

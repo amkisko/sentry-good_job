@@ -40,10 +40,21 @@ Gem::Specification.new do |spec|
     "documentation_uri" => "http://www.rubydoc.info/gems/#{spec.name}/#{spec.version}"
   }
 
-  spec.bindir = "exe"
-  spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
   spec.add_dependency "sentry-ruby", ">= 6.0", "< 7.0"
   spec.add_dependency "good_job", ">= 3.0", "< 5.0"
+
+  spec.add_development_dependency "appraisal", "~> 2"
+  spec.add_development_dependency "bundler", ">= 2"
+  spec.add_development_dependency "polyrun", ">= 2.2.0"
+  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rspec", "~> 3"
+  spec.add_development_dependency "rspec_junit_formatter", "~> 0.6"
+  spec.add_development_dependency "rubocop-rspec", "~> 3.8"
+  spec.add_development_dependency "rubocop-thread_safety", "~> 0.7"
+  spec.add_development_dependency "standard", "~> 1.52"
+  spec.add_development_dependency "standard-custom", "~> 1.0"
+  spec.add_development_dependency "standard-performance", "~> 1.8"
+  spec.add_development_dependency "standard-rspec", "~> 0.3"
 end

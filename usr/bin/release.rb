@@ -1,7 +1,12 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require "fileutils"
 require_relative "../lib/release_version_check"
+
+POLYRUN_WORKERS = 5
+
+FileUtils.mkdir_p("tmp")
 
 def execute_command(command)
   green = "\033[0;32m"
@@ -9,17 +14,20 @@ def execute_command(command)
   nc = "\033[0m"
 
   puts "#{green}#{command}#{nc}"
-  unless system(command)
+  shell_command = command.include?("|") ? "set -o pipefail; #{command}" : command
+  unless system("bash", "-c", shell_command)
     puts "#{red}Command failed: #{command}#{nc}"
     exit 1
   end
 end
 
-execute_command("bundle")
+execute_command("bundle install")
 execute_command("bundle exec appraisal generate")
 execute_command("bundle exec rubocop -a 2>&1 | tee tmp/rubocop.log")
-# execute_command("bundle exec rbs validate")
-execute_command("bundle exec rspec 2>&1 | tee tmp/rspec.log")
+
+test_command = "POLYRUN_COVERAGE=1 bundle exec polyrun parallel-rspec --workers #{POLYRUN_WORKERS} --merge-failures 2>&1 | tee tmp/polyrun-rspec.log"
+execute_command(test_command)
+execute_command("bundle exec rspec spec/integration 2>&1 | tee tmp/rspec-integration.log")
 
 puts "Tests passed. Checking git status..."
 

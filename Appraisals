@@ -1,5 +1,3 @@
-
-
 appraise "ruby34" do
   ruby ">= 3.4.0"
 end

@@ -1,0 +1,15 @@
+version: 1
+
+coverage:
+  output_path: coverage
+  formats:
+    - html
+    - cobertura
+    - console
+
+partition:
+  paths_file: spec/spec_paths.txt
+  paths_build:
+    all_glob: spec/**/*_spec.rb
+    exclude_prefixes:
+      - spec/integration/
