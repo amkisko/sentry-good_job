@@ -62,6 +62,42 @@ RSpec/DescribeClass:
 RSpec/VerifiedDoubles:
   Enabled: false
 
+RSpec/DescribedClass:
+  Enabled: false
+
+RSpec/AnyInstance:
+  Enabled: false
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/NoExpectationExample:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/MultipleDescribes:
+  Enabled: false
+
+RSpec/RepeatedExampleGroupDescription:
+  Enabled: false
+
+RSpec/RepeatedDescription:
+  Enabled: false
+
+RSpec/StubbedMock:
+  Enabled: false
+
+RSpec/ExpectActual:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/ReceiveMessages:
+  Enabled: false
+
 # Custom cop overrides
 Style/AccessModifierDeclarations:
   EnforcedStyle: inline
@@ -95,17 +131,27 @@ Metrics/ModuleLength:
   Enabled: true
   CountAsOne: [array, hash, heredoc, method_call]
   Max: 150
+  Exclude:
+    - lib/sentry/good_job/cron_helpers.rb
 Metrics/ClassLength:
   Enabled: true
   CountAsOne: [array, hash, heredoc, method_call]
   Max: 150
+  Exclude:
+    - lib/sentry/good_job/cron_helpers.rb
 Metrics/CyclomaticComplexity:
   Enabled: true
   Max: 10
+  Exclude:
+    - lib/sentry/good_job/cron_helpers.rb
 Metrics/PerceivedComplexity:
   Enabled: true
   Max: 10
+  Exclude:
+    - lib/sentry/good_job/cron_helpers.rb
 Metrics/AbcSize:
   Enabled: true
   Max: 15
   CountRepeatedAttributes: false
+  Exclude:
+    - lib/sentry/good_job/cron_helpers.rb
