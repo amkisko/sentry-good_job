@@ -29,4 +29,4 @@ Recorded 2026-09-07. Library gem. Claims audit, dependency recon, and sentry-rub
 - make test on the default Gemfile: rubocop 26 files no offenses; polyrun parallel-rspec 5 workers exit 0; spec/integration pending because sqlite3 is not in the default Gemfile.
 - BUNDLE_GEMFILE=gemfiles/ruby34.gemfile: 21 examples, 0 failures.
 - BUNDLE_GEMFILE=gemfiles/rails8.gemfile: 14 examples, 0 failures, including spec/integration.
-- After CI green, release 7.0.0. Consumers on sentry-ruby 6 stay on 6.2.1. Consumers on sentry-ruby 7 restore gem sentry-good_job, config.enabled_patches += [:good_job], and config.good_job.enable_cron_monitors = true.
+- After CI green, run make release. Consumers on sentry-ruby 6 stay on 6.2.1. Consumers on sentry-ruby 7 restore gem sentry-good_job, config.enabled_patches += [:good_job], and config.good_job.enable_cron_monitors = true.

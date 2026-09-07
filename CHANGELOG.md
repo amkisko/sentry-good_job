@@ -1,9 +1,9 @@
 # Changelog
 
-## 7.0.0
+## 7.0.0 (2026-09-07)
 
-- Require sentry-ruby 7
-- Leave enqueue tracing to sentry-rails when it already records the enqueue span
+- BREAKING: Require sentry-ruby 7 (`>= 7.0`, `< 8.0`)
+- Skip nested enqueue span when sentry-rails already records it
 - Collect job arguments through `config.data_collection.queues`
 
 ## 6.2.1

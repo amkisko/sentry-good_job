@@ -15,8 +15,9 @@ Recorded 2026-09-07. sentry-good_job 7.0.0 requires sentry-ruby 7 and skips a ne
 
 - VERSION is 7.0.0.
 - README Compatibility is Ruby 3.4+, Good Job 3.x and 4.x, Sentry Ruby SDK 7.x.
+- CHANGELOG.md 7.0.0 dated 2026-09-07. RubyGems still lists 6.2.1 as latest.
 
 ## Next
 
-- make test on the default Gemfile: rubocop clean; polyrun parallel-rspec exit 0; integration pending without sqlite3.
-- Release 7.0.0 after CI green.
+- Push main and wait for CI.
+- After CI green, run make release to publish 7.0.0.
