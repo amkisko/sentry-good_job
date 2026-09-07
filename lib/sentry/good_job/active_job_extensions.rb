@@ -92,11 +92,14 @@ module Sentry
         extend ActiveSupport::Concern
 
         included do
-          # Set up around_enqueue hook for GoodJob-specific enqueue span
           around_enqueue do |job, block|
             next block.call unless ::Sentry.initialized?
 
-            # Create enqueue span with GoodJob-specific data
+            if defined?(::Sentry::Rails::ActiveJobExtensions::SentryReporter) &&
+                ::Sentry::Rails::ActiveJobExtensions::SentryReporter.respond_to?(:record_producer_span)
+              next block.call
+            end
+
             ::Sentry.with_child_span(op: "queue.publish", description: job.class.name) do |span|
               _sentry_set_span_data(span, job)
               block.call

@@ -16,7 +16,7 @@ RSpec.describe Sentry::GoodJob do
   end
 
   it "has the correct version" do
-    expect(described_class::VERSION).to eq("6.2.1")
+    expect(described_class::VERSION).to eq("7.0.0")
   end
 
   describe "setup_good_job_integration" do

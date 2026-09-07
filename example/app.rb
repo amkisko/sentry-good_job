@@ -16,7 +16,7 @@ Sentry.init do |config|
 
   # ActiveJob configuration (handled by sentry-rails)
   config.rails.active_job_report_on_retry_error = false
-  config.send_default_pii = true  # Include job arguments
+  config.data_collection.queues = true
 end
 
 # Align with Rails conventions for jobs

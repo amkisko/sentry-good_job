@@ -16,8 +16,7 @@ module Sentry
           priority: job.respond_to?(:priority) ? job.priority : nil
         }
 
-        # Note: Job arguments are handled by sentry-rails via send_default_pii configuration
-        # This is controlled by Sentry.configuration.send_default_pii, not GoodJob-specific config
+        # Job arguments stay on sentry-rails via config.data_collection.queues
 
         # Merge with base context
         base_context.merge(good_job: good_job_context)

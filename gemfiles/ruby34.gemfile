@@ -4,4 +4,6 @@ source "https://rubygems.org"
 
 ruby ">= 3.4.0"
 
+gem "sentry-ruby", "~> 7.0.0"
+
 gemspec path: "../"

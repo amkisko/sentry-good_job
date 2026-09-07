@@ -53,7 +53,7 @@ Sentry.init do |config|
   
   # ActiveJob configuration (handled by sentry-rails)
   config.rails.active_job_report_on_retry_error = false
-  config.send_default_pii = false
+  config.data_collection.queues = false
 
   # Optional: Configure logging for debugging
   config.sdk_logger = Rails.logger
@@ -69,7 +69,7 @@ end
 #### ActiveJob Options (handled by sentry-rails)
 
 - `config.rails.active_job_report_on_retry_error` (default: `false`): Only report errors after all retry attempts are exhausted
-- `config.send_default_pii` (default: `false`): Include job arguments in error context (be careful with sensitive data)
+- `config.data_collection.queues` (default: `true`): Include job arguments in error context (be careful with sensitive data)
 - `config.sdk_logger` (default: `nil`): Configure the SDK logger for custom logging needs (general Sentry configuration)
 
 **Note**: The Good Job integration now leverages sentry-rails for core ActiveJob functionality, including trace propagation, user context preservation, and error reporting. This provides better integration and reduces duplication.
@@ -183,15 +183,14 @@ The integration automatically adds relevant context to error reports:
 - Execution count (GoodJob-specific)
 - Priority (GoodJob-specific)
 - Enqueued and scheduled timestamps
-- Job arguments (if enabled via send_default_pii)
+- Job arguments (if enabled via `config.data_collection.queues`)
 - Latency metrics (GoodJob-specific)
 
 ## Compatibility
 
-- Ruby 2.4+
-- Rails 5.2+
-- Good Job 4.x
-- Sentry Ruby SDK 6.x
+- Ruby 3.4+
+- Good Job 3.x and 4.x
+- Sentry Ruby SDK 7.x
 
 ## Contributing
 

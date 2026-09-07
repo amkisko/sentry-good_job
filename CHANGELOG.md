@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.0.0
+
+- Require sentry-ruby 7
+- Leave enqueue tracing to sentry-rails when it already records the enqueue span
+- Collect job arguments through `config.data_collection.queues`
+
 ## 6.2.1
 
 - Relax dependencies to allow all current versions of sentry-ruby and good_job

@@ -180,5 +180,25 @@ RSpec.describe Sentry::GoodJob::ActiveJobExtensions do
       # GoodJob extensions included into Active Job
       expect(job_class.ancestors).to include(Sentry::GoodJob::ActiveJobExtensions::GoodJobExtensions)
     end
+
+    it "does not wrap enqueue when sentry-rails already records the producer span" do
+      reporter = Class.new do
+        def self.sentry_context(_job)
+          {base: true}
+        end
+
+        def self.record_producer_span(_job)
+          yield
+        end
+      end
+      stub_const("Sentry::Rails::ActiveJobExtensions", Module.new)
+      stub_const("Sentry::Rails::ActiveJobExtensions::SentryReporter", reporter)
+
+      allow(Sentry).to receive(:with_child_span)
+
+      HappyJob.new.send(:run_callbacks, :enqueue) {}
+
+      expect(Sentry).not_to have_received(:with_child_span)
+    end
   end
 end

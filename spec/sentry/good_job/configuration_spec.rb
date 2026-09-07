@@ -29,7 +29,7 @@ RSpec.describe Sentry::GoodJob::Configuration do
     # - report_after_job_retries (use sentry-rails active_job_report_on_retry_error)
     # - report_only_discarded_jobs (handled by ActiveJob retry/discard logic)
     # - propagate_traces (handled by sentry-rails)
-    # - include_job_arguments (use sentry-rails send_default_pii)
+    # - include_job_arguments (use sentry-rails data_collection.queues)
 
     it "allows setting enable_cron_monitors" do
       config.enable_cron_monitors = false
