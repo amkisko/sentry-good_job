@@ -24,8 +24,10 @@ bundle exec rspec spec/integration
 Parallel unit specs only:
 
 ```bash
-bundle exec polyrun parallel-rspec --workers 5 --merge-failures
+bundle exec polyrun parallel-rspec --workers 5 --merge-failures -- rspec
 ```
+
+Pass `-- rspec` after the flags. The parent is already `bundle exec`. A second `bundle exec` under Ruby 4.0 and Bundler 2.5.9 exits 1 after examples pass.
 
 See `polyrun.yml` and `config/polyrun_coverage.yml`.
 

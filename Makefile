@@ -7,7 +7,7 @@ lint:
 	bundle exec rubocop
 
 test: lint
-	bundle exec polyrun parallel-rspec --workers 5 --merge-failures
+	bundle exec polyrun parallel-rspec --workers 5 --merge-failures -- rspec
 	bundle exec rspec spec/integration
 
 clean:

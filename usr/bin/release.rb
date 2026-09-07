@@ -25,7 +25,7 @@ execute_command("bundle install")
 execute_command("bundle exec appraisal generate")
 execute_command("bundle exec rubocop -a 2>&1 | tee tmp/rubocop.log")
 
-test_command = "POLYRUN_COVERAGE=1 bundle exec polyrun parallel-rspec --workers #{POLYRUN_WORKERS} --merge-failures 2>&1 | tee tmp/polyrun-rspec.log"
+test_command = "POLYRUN_COVERAGE=1 bundle exec polyrun parallel-rspec --workers #{POLYRUN_WORKERS} --merge-failures -- rspec 2>&1 | tee tmp/polyrun-rspec.log"
 execute_command(test_command)
 execute_command("bundle exec rspec spec/integration 2>&1 | tee tmp/rspec-integration.log")
 
