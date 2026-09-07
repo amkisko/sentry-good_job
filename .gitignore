@@ -80,5 +80,5 @@ node_modules/
 # RSpec status file
 .rspec_status
 
-.pray/cache
+.pray/
 .DS_Store
