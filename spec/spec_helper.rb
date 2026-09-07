@@ -47,14 +47,6 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.before :suite do
-    puts "\n"
-    puts "*" * 100
-    puts "Running with Good Job #{GoodJob::VERSION}"
-    puts "*" * 100
-    puts "\n"
-  end
-
   config.before do
     # Make sure we reset the env in case something leaks in
     ENV.delete("SENTRY_DSN")
