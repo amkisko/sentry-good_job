@@ -15,30 +15,53 @@ To change shared guidance, update `Prayfile` and run `pray install`.
 - prefer files around <=150 LOC when cohesion allows, but never split coherent logic purely to satisfy line count; split only when it improves ownership, readability, and reviewability;
 - do not use abbreviations and short names for variables, methods, classes, etc. unless it is a very common abbreviation or short name;
 - avoid explanatory comments, but allow intent comments for non-obvious constraints, invariants, concurrency edges, or external contract requirements;
-- keep the idea that code reflects user experience, so readability, structure, and clarity are product qualities, not optional polish;
+- keep the idea that code reflects user experience, so readability, structure, and clarity are product qualities;
 - pull request description should include answers to questions: what problem is solved, why it matters, how the solution works, and any relevant context; if the change is non-trivial, include reproduction steps or a changelog entry with intent;
 - pull request checklist: changelog entry with intent or reproduction steps when relevant, test coverage, and quality checks done;
-- suggest updating usr/docs/changelogs with a short summary and PR link only when the change is significant enough to be mentioned; changelog files should use `usr/docs/changelogs/#{date +"%Y%m%d%H%M%S"}_<title>.md`;
-- when documenting ideas, issues, user requests, new features, bugfixes, chores, etc., use `usr/docs/issues/#{date +"%Y%m%d%H%M%S"}_<title>.md`;
-- validation output must list exact commands run and observed results, and never claim tests pass unless they were executed and passed;
-- ignore style-only dust unless it harms correctness, operability, maintainability, or auditability under realistic load.
+- follow docs-conventions for usr/docs trace filenames and layout;
+- report completed actions only with observed evidence; validation output must list exact commands run and observed results;
+- ignore style-only dust unless it harms correctness, operability, maintainability, or auditability under realistic load;
+- fix the cause of a race, not a retry around it; prefer positive names; compute at write when a read cannot paginate; do not change production design only so tests can reach it.
 <!-- pray:9068e4a2 -->
+
+<!-- pray:781b7711 -->
+## Credentials and Secrets
+
+- Prefer a secret store or OS credential helper over embedding live secrets in config files, scripts, or documentation. Named managers (for example 1Password, Bitwarden, KeePassXC) are fine; the requirement is isolation, not a specific vendor.
+- Config and project files may hold references (vault paths, item ids, redacted fingerprints). They must not hold live tokens, API keys, passwords, or client secrets.
+- Do not pass secrets on command lines or in other process-visible arguments. Prefer secret-store lookup, short-lived credentials, or stdin/file descriptors that do not persist in shell history.
+- Do not commit secrets, paste them into issues or pull requests, or write them to logs. Rotate anything that may have been exposed.
+
+## Tracking and identification
+
+- A redacted fingerprint above is a hash of a secret for config references. A device fingerprint is fields that combine to identify a person or device across sessions or observers.
+- Identifiers, IP addresses, device marks, and combined attributes are personal data. They can unmask a person, a location, or a session secret. Emit them only when the feature they asked for this session needs them and they were shown that this product would.
+- Silent analytics ids, leftover marks after logout, and canvas or hardware probes are security events. They can locate a person, stitch sessions, or leak a credential-shaped token.
+
+## Ownership and destinations
+
+- Lookups go through an ownership set; request parameters pick which row; fail closed when access cannot be proven.
+- Treat user-supplied URLs as untrusted; rate-limit authentication and abuse-prone endpoints.
+
+Related: `engineering-audit` security mode asks whether a parameter establishes access and whether a worker skipped policy.
+<!-- pray:781b7711 -->
 
 <!-- pray:bfe6ff38 -->
 - `docs/` is for human-facing documentation: setup guides, architecture, migration notes, and operator material meant for users and contributors without agent context; use stable descriptive filenames;
-- `usr/docs/` is for durable agent and engineering trace alongside other project-local operator surfaces under `usr/`; keep inference input (AGENTS.md, `.agents/`) separate from human docs;
-- trace files under `usr/docs/issues`, `usr/docs/plan`, `usr/docs/changelogs`, `usr/docs/meetings`, `usr/docs/dependencies`, `usr/docs/tasks`, and `usr/docs/ideas` use `YYYYMMDDHHMMSS_<kebab-case-title>.md`; no README index in those trees;
-- any doc in those trace trees should make five things findable (use `##` headings or equivalent; omit empty sections): **Participants** (humans only; omit agents, tools, and binaries), **Decisions** (what was agreed), **Effects** (done, failed, recovered, rolled back), **Next** (todo, planned, open questions), **Source** (links upstream—meeting, issue, PR, commit—and downstream materializations); git history is the edit log; add an explicit note only when a later pass changes meaning (scope cut, rollback, decision reversed);
-- mention software, tools, agents, or binaries in a note only when that detail is needed for execution or later analysis; put it under Decisions, Effects, or Source—not under Participants;
-- never put local absolute paths or private material in `docs/` or `usr/docs/`: no home-directory or machine-specific filesystem paths, secrets, credentials, tokens, API keys, or personal private data; prefer repository-relative paths;
+- `usr/docs/` is for durable agent and engineering trace; keep inference input (AGENTS.md, `.agents/`) separate from human docs;
+- `usr/migrate/` holds live console-first scripts for a change that must run before new code is on the process; later schema migrate is schema-only and idempotent;
+- four usr/docs timestamp trees, no README index, filename `YYYYMMDDHHMMSS_<kebab-case-title>.md`: `issues` (live work: contract, findings, open next; pitch, plan, and queue stay here), `changelogs` (what shipped), `meetings` (one sitting: who was there and what they agreed), `dependencies` (upstream defects from real work);
+- issues, changelogs, and meetings make five things findable (use `##` headings or equivalent; omit empty sections): **Participants** (humans only; omit agents, tools, and binaries), **Decisions** (what was agreed), **Effects** (done, failed, recovered, rolled back), **Next** (todo, planned, open questions), **Source** (links upstream: meeting, issue, PR, commit, and downstream materializations); git history is the edit log; add an explicit note only when a later pass changes meaning (scope cut, rollback, decision reversed);
+- mention software, tools, agents, or binaries in a note only when that detail is needed for execution or later analysis; put it under Decisions, Effects, or Source, not under Participants;
+- never put local absolute paths or private material in `docs/` or under `usr/`: no home-directory or machine-specific filesystem paths, secrets, credentials, tokens, API keys, or personal private data; prefer repository-relative paths;
 <!-- pray:bfe6ff38 -->
 
 <!-- pray:edcc5f67 -->
 ## Dependency issues
 
-When work surfaces a clearly visible bug or defect in a dependency — wrong behavior, broken API contract, regression between versions, or a fix already merged upstream but not released — say so in the task output and suggest a concrete fix path: upgrade, pin, patch, vendor, workaround, or upstream report.
+When work surfaces a clearly visible bug or defect in a dependency (wrong behavior, broken API contract, regression between versions, or a fix already merged upstream but not released), say so in the task output and suggest a concrete fix path: upgrade, pin, patch, vendor, workaround, or upstream report.
 
-Store evidence under `usr/docs/dependencies/#{YYYYMMDDHHMMSS}_<kebab-case-title>.md`; no README index in that tree. Each file should make these findable (use `##` headings or equivalent; omit empty sections): **Dependency** (name, version constraint, lockfile entry if any), **Symptom** (what breaks and where), **Evidence** (repro steps, logs, stack traces, links to issues or commits), **Suggested fix** (upgrade, pin, patch, workaround, or upstream report), **Next** (todo, planned, open questions), **Source** (links upstream—issue, PR, release note, commit—and downstream materializations in this repo). Git history is the edit log.
+Store evidence under `usr/docs/dependencies/#{YYYYMMDDHHMMSS}_<kebab-case-title>.md`; no README index in that tree. Each file should make these findable (use `##` headings or equivalent; omit empty sections): **Dependency** (name, version constraint, lockfile entry if any), **Symptom** (what breaks and where), **Evidence** (repro steps, logs, stack traces, links to issues or commits), **Suggested fix** (upgrade, pin, patch, workaround, or upstream report), **Next** (todo, planned, open questions), **Source** (links upstream: issue, PR, release note, commit, and downstream materializations in this repo). Git history is the edit log.
 
 Do not open drive-by dependency hunts; record only issues encountered while doing the requested work and only when the defect is evident from behavior or published upstream facts, not speculation.
 
@@ -48,7 +71,7 @@ For proactive selection, alteration, and audit rules, use `dependency-policy` an
 <!-- pray:3ac5d6ce -->
 ## Dependency policy
 
-Rules for adding, changing, or removing third-party packages. Apply across languages (Ruby, Rust, Elixir, JavaScript, and others). Names vary by ecosystem; concepts do not.
+Rules for adding, changing, or removing third-party packages. Apply across languages. Names vary by ecosystem; concepts do not.
 
 Terminology:
 
@@ -57,50 +80,15 @@ Terminology:
 - registry — published versions consumers resolve (`RubyGems`, `npm`, `crates.io`, `Hex`, etc.)
 - hot path — code on the security, auth, crypto, IO, or request/response boundary users rely on
 
-### Before adding a dependency
-
-Stop until one of these applies:
+Stop until one of these applies before adding a dependency:
 
 - stdlib or the framework for this tree already covers it;
 - an installed transitive dependency already covers it without a second library for the same job;
-- the feature genuinely needs a new package and tests will prove behavior.
+- the feature needs a new package and tests will prove behavior.
 
-Then prefer packages that:
+Run dependency-audit for direct dependency changes, graph audits, releases with hot-path package changes, and plausible dependency vulnerability or exploitation signals found during ordinary work. Keep the evidence and assessment in the live-work or dependency record.
 
-- share a trusted maintainer cluster and spec family with dependencies already on the hot path (same author group, same protocol stack, same RFC family);
-- align with the domain protocol being implemented (do not bolt on a parallel HTTP client, JWT stack, or crypto helper when the main stack already carries one);
-- show real adoption on the registry and recent maintenance (commits and published versions; registry publish date matters when upstream release tags lag);
-- keep bus factor visible: a coherent maintainer cluster is good for integration; a lone micro-package on a hot path is a supply-chain risk unless adoption and release cadence are strong.
-
-Reject or defer when:
-
-- the capability duplicates an existing node in the graph;
-- issues-per-star and open pull request backlog suggest maintainer strain on a small package;
-- a major version adds native extensions or platform matrices the CI matrix does not exercise;
-- license or export-control terms conflict with product use.
-
-### When altering dependencies
-
-- run advisory scans on every lockfile or variant graph CI installs (root lockfile alone is not enough when matrix gemfiles, workspaces, or target-specific locks exist);
-- keep hot-path and direct runtime packages at the latest safe registry version unless a documented exception explains the pin;
-- tighten package manifest floors when security fixes require a minimum version; lockfiles protect this repo, manifests protect downstream consumers;
-- on major upgrades, grep for adapters (HTTP mocks, test doubles, middleware, FFI shims) and run the full CI matrix;
-- delete redundant packages when a transitive or cluster dependency subsumes them; wrap remaining vendor exceptions at trust boundaries with project error types, not raw vendor exceptions in user-facing paths;
-- list exact commands and observed results in validation output; never claim a clean audit without running it.
-
-### Automation
-
-- gate CI on advisory checks for the ecosystems that exist in the repository; drop automated update config for ecosystems with no manifest;
-- use grouped automated update pull requests for lockfiles; human review still applies selection rules above;
-- run the dependency-audit skill when asked for a dependency audit, before a release that changes hot-path packages, or after a published advisory names a package in the graph.
-
-Full dependency audits rely on deep recon and OSINT, not only lockfile scanners. Automated advisory and outdated checks are necessary baseline; they are not sufficient for hot-path packages or for add/replace decisions.
-
-### Relationship to other prayers
-
-- `dependency-issues` — record upstream defects encountered during real work; do not open drive-by hunts;
-- `minimal-implementation` — no new dependency when an existing path suffices;
-- `engineering-audit` — code and pipeline review; dependency-audit focuses on the supply graph.
+Related: `dependency-issues` records upstream defects found during real work; `minimal-implementation` covers YAGNI before adding deps; `engineering-audit` covers code and pipeline review.
 <!-- pray:3ac5d6ce -->
 
 <!-- pray:bf80d00f -->
@@ -113,7 +101,7 @@ Full dependency audits rely on deep recon and OSINT, not only lockfile scanners.
 <!-- pray:bf7304a6 -->
 ## Minimal implementation
 
-Efficient means the smallest correct change, not careless or under-tested.
+Efficient means the smallest correct change.
 
 Before writing code, stop at each step until one applies:
 - does the feature need to exist at all (YAGNI)?
@@ -122,9 +110,14 @@ Before writing code, stop at each step until one applies:
 - can the change be one line; if so, make it one line?
 - only then write the minimum code that works.
 
+Before adding a new library directory or first-party package, stop until one applies:
+- one product owns the contract and is the only caller: keep source in that tree;
+- a second in-repo caller, or no product runtime: unpublished in-repo package (own manifest, own tests, path-linked, 0.x, registry publish blocked);
+- a second repository or registry consumer: extract, publish, then follow dependency-policy.
+
 Rules:
 - match the language of the directory you are changing (see Preferred stack and tools above);
-- no abstractions unless the request or clear reuse needs them;
+- no abstractions unless three real variations need them; drop unused public methods;
 - no new dependency when stdlib, the framework for this tree, or an installed dependency suffices;
 - no boilerplate the task did not ask for;
 - deletion over addition; boring over clever; fewest files that stay readable (see file size guidance above);
@@ -135,17 +128,22 @@ Rules:
 Not optional even when minimizing scope:
 - input validation at trust boundaries;
 - error handling that prevents data loss;
-- security and accessibility (see UI/UX checks);
+- security and accessibility;
 - calibration against real hardware and production drift when the platform ideal is not the spec;
 - anything explicitly requested in the task or ticket;
 - tests for non-trivial behavior per @spec/README.md and the testing bullets above; trivial one-liners need no new spec.
+
+Related: `keep-the-work` covers staying on the failed place and keeping answers after a refusal; `dependency-policy` covers third-party registry packages.
 <!-- pray:bf7304a6 -->
 
 <!-- pray:120c3507 -->
 ## Finite state machines
 
-- model lifecycles with explicit finite state machines when status, allowed transitions, and side effects matter; prefer named states and guarded transitions over scattered conditionals and implicit enums alone;
-- finite state machines are not only for workflow logic: they can compactly represent ordered sets or maps of strings supporting fast prefix, suffix, and fuzzy search; consider tries and automata when matching catalogs, codes, routes, or searchable vocabularies at scale.
+- model lifecycles with explicit finite state machines when status, allowed transitions, and side effects matter; prefer named states and guarded transitions over scattered conditionals and implicit enums alone; when who and when matter, model the event as a record, not a boolean flag;
+- finite state machines can compactly represent ordered sets or maps of strings supporting fast prefix, suffix, and fuzzy search; consider tries and automata when matching catalogs, codes, routes, or searchable vocabularies at scale;
+- when digital reported state and physical process state can diverge, name both machines and the observation that couples them; occupancy listing is not the lock; a reported identity is not the person or sample at the station.
+
+Related: `engineering-audit` boundary mode asks when those states disagree without an alarm; `io-simulation` injects the faults that cause the split.
 <!-- pray:120c3507 -->
 
 <!-- pray:26f3566a -->
@@ -178,15 +176,56 @@ Examples:
 - elixir for concurrent and distributed systems, and for its actor model and fault tolerance
 - rust for system programming and performance-critical code
 - javascript, html, css for native browser experience
-- humane and accessible design principles for UI/UX, and for clear communication of intent and feedback
+- humane and accessible design principles for UI/UX, and for clear communication of intent and feedback; label icon-only controls; hide decorative duplicates from the accessibility tree
+
+Related: `keep-the-work` covers staying on the failed place and keeping answers after a refusal.
 <!-- pray:f528eeca -->
+
+<!-- pray:d3b0d939 -->
+## IO simulation
+
+- when a product depends on live IO from an external virtual or physical service, ship a simulation of that plant that speaks the same protocol the product already uses;
+- give the simulation a control UI so a person can set the parameters that produce that IO while using the product: position, clock, amount, device state, and faults;
+- injectable faults: unavailable, slow, valid but false, stale, protocol meaning change, partition, clock disagreement, reset, freeze, drift, duplicated command, command after timeout, reconnect replay, two authorities, obsolete operator display;
+- keep the product on its production adapter; the simulation is a plant the adapter talks to;
+- point the product at a vendor station when that station already covers those parameters (testmode dashboards, device emulator extended controls);
+- a library that only answers request and response has no plant, so it does not need this workbench.
+
+Related: `engineering-audit` enumerates those boundary conditions; `finite-state-machines` models the plant lifecycle; `preferred-stack` covers humane control UI; `minimal-implementation` still requires later calibration on real hardware.
+<!-- pray:d3b0d939 -->
 
 <!-- pray:ca94e22d -->
 ## Writing and changelog prose checks
 
-Read once for marketing odor, once for negation-led sentences, once for stray em dashes, and once for paragraphs that break on clause instead of on scene; keep live notes and metadata honest and plain.
-- repo trace under usr/docs/issues, usr/docs/tasks, and usr/docs/changelogs: plain prose readable without a rendered preview—no markdown tables, bold, italic, or other styling; prioritize factual accuracy over presentation.
+Review for marketing language, invented objections, empty contrasts, stray em dashes, and paragraph flow; keep notes and metadata honest and plain.
+- repo trace under usr/docs: plain prose readable without a rendered preview. No markdown tables, bold, italic, or other styling. Prioritize factual accuracy over presentation.
+- Ease, lexical diversity, coherence, mechanics, and claim integrity are separate constructs. Automated matches, readability grades, similarity, and model preference are review prompts; preserve meaning, necessary negation, scope, and uncertainty when editing.
+- Keep agency on the person who acts. Tools and process nouns do mechanical work.
+- Technical names, APIs, CLI verbs, RFC titles, identifiers, and UI copy use instrument and protocol words: check-in, last-seen, probe, monitor, expected tick. Body and organism metaphors such as heartbeat, pulse, and organ stay out of contracts and code. HTTP `/health` remains the liveness probe until a later RFC.
+- One sentence holds one beat. Consecutive short sentences that only restated the same beat are a punchline stack.
+- For material external claims, quotations, dates, or research summaries, use the claims-audit skill.
 <!-- pray:ca94e22d -->
+
+<!-- pray:d893ab3d -->
+## Claims and testimony
+
+Treat checkable facts, quotations, dates, quantities, and causal statements as claims. Treat author memory and clearly framed interpretation as testimony.
+
+- Inventing scenes, sources, numbers, or quotations is out of scope.
+- A link or citation in the text is not verification. The cited passage must support the claim's scope, date, population, and causal strength.
+- If a material external claim cannot be checked in this run, mark it unverifiable rather than rounding it to certainty.
+- Run the claims-audit skill when asked to verify, fact-check, or research checkable claims, or when prose under edit states material external facts, quotations, dates, or research summaries.
+
+Related: `writing-prose` covers voice and quality constructs; `engineering-audit` covers code and pipeline behavior.
+<!-- pray:d893ab3d -->
+
+<!-- pray:b1ea9b07 -->
+## RFC process
+
+Significant user-facing contract changes start as an RFC. Skip a bugfix, typo, or refactor that leaves those contracts in place.
+
+Claim `rfcs/ids/NNNN` before writing `rfcs/NNNN-slug.md`. Copy `rfcs/0000-template.md`. Omit unused header fields and empty sections. Implementation PRs cite `RFC-NNNN`. Numbering bands, isolation, and extra product tests live in `rfcs/README.md`. Follow the rfc-process skill. Product RFCs specify a design. Version numbers belong in changelogs. Keep existing RFC numbers. RFC titles, registrar names, and identifiers use instrument and protocol words; body and organism metaphors stay out of contracts and code.
+<!-- pray:b1ea9b07 -->
 
 <!-- pray:08c294fb -->
 ## Likely rejected changes
@@ -201,48 +240,19 @@ Read once for marketing odor, once for negation-led sentences, once for stray em
 <!-- pray:2543c1cc -->
 ## Checks before publish (engineering)
 
-Verify the change is wanted, discuss first for unconfirmed larger features, describe what problem is solved and why it matters, include tests, add screenshots or screen recordings for UI changes, keep one PR to one concern, and understand any AI-assisted code you submit.
+- verify the change is wanted; discuss first for unconfirmed larger features
+- describe what problem is solved and why it matters
+- include tests
+- add screenshots or screen recordings for UI changes
+- keep one pull request to one concern
+- understand any AI-assisted code you submit
 <!-- pray:2543c1cc -->
 
 <!-- pray:48e8a6b3 -->
 ## Collaboration workflow
 
-- keep human-facing documentation in `docs/`;
-- keep durable agent and engineering trace in `usr/docs/`; use folders such as `usr/docs/changelogs`, `usr/docs/issues`, `usr/docs/plan`, `usr/docs/tasks`, and `usr/docs/ideas`;
-- agent-assisted work with ongoing project value must leave a trace in the repo;
-- store only specific, decision-bearing, high-signal material; do not commit generic notes, copied chat logs, or filler;
-- use the lightest process that preserves traceability; design-only work does not need branch ceremony unless implementation work starts.
+- record durable project value in the live-work queue, including improvements to shared guidance or a skill;
+- keep only decision-bearing material; omit generic notes, copied chat, and filler;
+- use the lightest trace that preserves context; design-only work needs no branch unless implementation starts;
+- follow docs-conventions for `docs/` and `usr/docs/`.
 <!-- pray:48e8a6b3 -->
-
-<!-- pray:aa6c8f33 -->
-## Shared prayers
-
-This project uses [pray](https://github.com/kiskolabs/pray) to install and lock shared inference input from the amkisko prayers distribution.
-
-Install the CLI:
-
-```sh
-cargo install --git https://github.com/kiskolabs/pray --locked pray
-```
-
-Initialize or update managed input:
-
-```sh
-pray install
-pray plan
-pray apply
-pray verify
-```
-
-Declare dependencies in `Prayfile`. Do not edit managed spans in `AGENTS.md` or `.agents/skills/`.
-
-To refresh shared guidance after publishers release new versions:
-
-```sh
-pray update
-pray plan
-pray apply
-```
-
-Distribution source for amkisko-wide packages: [amkisko/prayers](https://github.com/amkisko/prayers).
-<!-- pray:aa6c8f33 -->

@@ -2,7 +2,7 @@
 
 Use when asked to audit dependencies, review lockfiles, assess supply-chain risk, or decide whether upgrades are safe.
 
-Read `dependency-policy` in the shared prayers fragment for selection and alteration rules this audit enforces.
+Read `references/selection-and-alteration.md` for prefer/reject rules and alteration checks this audit enforces.
 
 ## Voice and prose
 
@@ -11,7 +11,7 @@ Evidence-first. List exact commands, queries, and URLs consulted. Never claim ad
 - no drive-by dependency hunts when the task is unrelated;
 - separate hot-path findings from dev-only lag;
 - label OSINT inference (stars, issue ratios, maintainer overlap) as heuristic with confidence;
-- findings for `usr/docs/issues/` or `usr/docs/dependencies/`: plain prose per docs conventions.
+- findings for `usr/docs/issues/` (this work) or `usr/docs/dependencies/` (upstream defects): plain prose per docs conventions.
 
 ## Role
 
@@ -84,9 +84,11 @@ For each hot-path package audited, report:
 - watch / healthy / concern classification with confidence;
 - links or identifiers for sources consulted.
 
-## Pass 1 — Security (advisories)
+## Pass 1 — Security assessment
 
-Goal: zero known advisories on every graph CI installs.
+Goal: every plausible dependency security signal is assessed. Every affected target has an explicit disposition; every `under_investigation` assessment has a responsible person and a review date or evidence condition in Next.
+
+For suspicious package behavior, an advisory, scanner match, code finding, or reproducible exploit, follow `references/vulnerability-assessment.md`. Scope the status to a named product release, deployment, build graph, test graph, or automation graph.
 
 Actions (adapt to ecosystem):
 
@@ -94,21 +96,25 @@ Actions (adapt to ecosystem):
 - scan each variant lockfile, workspace member, or appraisal gemfile the CI matrix resolves;
 - note manifest minimum versions that still allow vulnerable ranges for downstream consumers;
 - cross-check hot-path packages against GHSA or vendor advisories when the ecosystem DB lags.
+- assess component presence, affected code, execution phase, attacker control, mitigations, and impact;
+- record `under_investigation`, `affected`, `fixed`, or `not_affected` with evidence and any required disposition.
 
-Report: advisory id, affected package, locked version, fixed version, hot-path tier, source URL when available.
+Report: trigger or advisory id, package and version, assessment target, status, applicability evidence, priority inputs, disposition, Next when required, and source URL when available.
 
 ## Pass 2 — Freshness (locked vs registry)
 
-Goal: direct runtime and hot-path transitive packages at latest published safe version.
+Goal: direct runtime and hot-path transitive packages at latest published safe version. Record lag metrics (libyears or equivalent): total, average per package, major-version distance, paired with test coverage. Procedure in `references/libyears.md`. Lag is not effort and not a CVE.
 
 Actions:
 
 - compare locked versions to registry latest for direct runtime dependencies;
 - run outdated tooling where the ecosystem provides it; filter noise from dev-only tooling unless it blocks upgrades;
+- measure libyears or the ecosystem's equivalent lag; record total, average per package, and major-version distance;
 - flag major-version lag and document adapter risk (test mocks, native extensions, breaking API renames);
-- use recon publish dates when release tags are stale.
+- use recon publish dates when release tags are stale;
+- when feasible, spike-upgrade the worst offenders and record whether the tree still works.
 
-Report: package, locked, latest, gap type (patch, minor, major), tier.
+Report: package, locked, latest, gap type (patch, minor, major), tier; plus graph-level total lag, average lag, coverage, and spike result when attempted.
 
 ## Pass 3 — Ecosystem synthesis
 
@@ -137,8 +143,8 @@ Apply every rule with tier in mind.
 
 | Tier | Examples | Audit strictness |
 |------|----------|------------------|
-| Hot path direct | auth, crypto, HTTP client, framework core, RPC | recon mandatory; advisories zero; latest safe version |
-| Hot path transitive | OAuth client, JWT, TLS, serializer on boundary | recon mandatory; advisories zero; upgrade with parent or explicitly |
+| Hot path direct | auth, crypto, HTTP client, framework core, RPC | recon mandatory; assess every match; latest safe version |
+| Hot path transitive | OAuth client, JWT, TLS, serializer on boundary | recon mandatory; assess every match; upgrade with parent or explicitly |
 | Dev / test only | linter, test framework, local server, coverage | advisories if installed; recon light unless flagged |
 | Automation | CI actions, release tooling | pin hygiene; upstream release notes on bump |
 
@@ -156,10 +162,11 @@ Apply every rule with tier in mind.
 | Sources | advisory id, registry URL, repo, issue link, or command run |
 | Smallest fix | bump lock, tighten manifest floor, remove duplicate, add CI gate, pin with documented reason |
 | Deeper fix | cluster consolidation, vendor/fork, replace package |
+| Security fields | trigger or advisory, assessment target, status, applicability, priority inputs, disposition, and required Next |
 
 ## Ranking
 
-Order work by: hot-path exposure, advisory severity, recon watch items on security-sensitive packages, freshness gap, fix cost.
+For security findings, assess target applicability. Rank unresolved signals by credible exposure and consequence; rank affected targets by attacker exposure, known exploitation, consequence, exploit likelihood, technical severity, fix availability, and remediation cost. Rank other findings by hot-path exposure, recon concern, freshness gap, and fix cost.
 
 Present manifest floor and lockfile bump together when consumers could resolve vulnerable ranges.
 
@@ -176,7 +183,7 @@ Before recommending a new package, verify with recon:
 
 ## Alteration checks (when audit recommends upgrades)
 
-1. advisory-clean after bump across all CI graphs;
+1. every plausible dependency security signal after the bump is assessed; affected targets have a disposition and open assessments have Next;
 2. recon confirms upstream is actively maintained or pin is deliberate;
 3. tests and adapters updated for major versions;
 4. manifest floors updated when needed;
@@ -196,8 +203,8 @@ Call out missing gates explicitly. Automation does not replace Pass 0 recon for 
 
 ## Relationship to dependency-issues
 
-During implementation work, record clear upstream defects under `usr/docs/dependencies/` per the dependency-issues prayer. This audit pass is proactive graph review with recon; dependency-issues is reactive evidence from real tasks.
+During implementation work, keep unconfirmed signals under `usr/docs/issues/`; record evidenced upstream defects under `usr/docs/dependencies/` per the dependency-issues prayer. This audit pass is proactive graph review with recon; dependency-issues is reactive evidence from real tasks.
 
 ## Ignore
 
-Dev-only minor lag on linters and test helpers when advisories are clean and runtime is current. Style preferences about package managers. Maintainer intent without issue, commit, release, or registry evidence. Treating a single advisory scan as a complete audit when the user asked for full dependency health.
+Dev-only minor lag on linters and test helpers when security signals are assessed and runtime is current. Style preferences about package managers. Maintainer intent without issue, commit, release, or registry evidence. Treating a single advisory scan as a complete audit when the user asked for full dependency health.
