@@ -59,7 +59,7 @@ GEM
     crass (1.0.7)
     diff-lcs (1.6.2)
     drb (2.2.3)
-    erb (6.0.6)
+    erb (6.0.7)
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
@@ -108,7 +108,7 @@ GEM
     prism (1.9.0)
     raabro (1.5.0)
     racc (1.8.1)
-    rack (3.2.6)
+    rack (3.2.7)
     rack-session (2.1.2)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
