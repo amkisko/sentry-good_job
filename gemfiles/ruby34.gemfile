@@ -4,6 +4,11 @@ source "https://rubygems.org"
 
 ruby ">= 3.4.0"
 
+gem "railties", ">= 8.0.4.1"
+gem "rack", ">= 3.2.6"
+gem "loofah", ">= 2.25.2"
+gem "crass", ">= 1.0.7"
+gem "erb", ">= 6.0.4"
 gem "sentry-ruby", "~> 7.0.0"
 
 gemspec path: "../"
