@@ -100,6 +100,10 @@ config.good_job.cron = {
 }
 ```
 
+Sentry creates or updates monitors on the first check-in. `enable_cron_monitors` registers check-ins on job classes. It is not a substitute for `config.good_job.enable_cron = true` or `good_job start --enable-cron`.
+
+Callable Good Job cron schedules continue to run, but this integration skips Sentry monitor configuration for them because they do not provide a static crontab.
+
 You can also manually set up cron monitoring:
 
 ```ruby

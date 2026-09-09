@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Warn when Good Job cron is empty while leaving setup available for a later reload
+- Attach cron monitors when Rails finishes booting and reattach them when job classes reload
+- Skip callable cron schedules with a warning instead of failing initialization
+- Read string or symbol keys on cron job config
+- Warn when Good Job cron is off, or when CLI options prevent confirming it during Rails boot
+- Document that monitors are created or updated on the first check-in
+
 ## 7.0.0 (2026-09-07)
 
 - BREAKING: Require sentry-ruby 7 (`>= 7.0`, `< 8.0`)

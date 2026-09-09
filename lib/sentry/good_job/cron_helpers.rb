@@ -62,23 +62,22 @@ module Sentry
         end
       end
 
-      # Main integration class that handles all cron monitoring setup
-      # This class follows Good Job's integration patterns and Sentry's extension guidelines
       class Integration
-        # Track whether setup has already been performed to prevent duplicates
         @setup_completed = false
         @reload_hooked = false
 
-        # Set up monitoring for all scheduled jobs from Good Job configuration
         def self.setup_monitoring_for_scheduled_jobs
           return unless ::Sentry.initialized?
           return unless ::Sentry.configuration.good_job.enable_cron_monitors
           attach_reload_hook_if_available
           return if @setup_completed
+          return unless rails_application?
 
-          return unless defined?(::Rails) && ::Rails.respond_to?(:application) && ::Rails.application
           cron_config = ::Rails.application.config.good_job.cron
-          return if cron_config.blank?
+          if cron_config.nil? || cron_config == {}
+            log_empty_cron_skip
+            return
+          end
 
           added_jobs = []
           cron_config.each do |cron_key, job_config|
@@ -93,72 +92,49 @@ module Sentry
           else
             Sentry.configuration.sdk_logger.info "Sentry cron monitoring setup for #{cron_config.keys.size} scheduled jobs"
           end
+          log_cron_scheduler_disabled_if_needed
         end
 
-        # Reset setup state (primarily for testing)
         def self.reset_setup_state!
           @setup_completed = false
         end
 
-        # Set up monitoring for a specific job
         def self.setup_monitoring_for_job(cron_key, job_config)
-          job_class_name = job_config[:class]
-          cron_expression = job_config[:cron]
-
+          job_class_name = job_config[:class] || job_config["class"]
+          cron_expression = job_config[:cron] || job_config["cron"]
           return unless job_class_name && cron_expression
 
-          # Defer job class constantization to avoid boot-time issues
-          # The job class will be constantized when the job is actually executed
-          # This prevents issues during development boot and circular dependencies
-
-          # Store the monitoring configuration for later use
-          # We'll set up the monitoring when the job class is first loaded
-          deferred_setup = lambda do
-            job_class = begin
-              job_class_name.constantize
-            rescue NameError => e
-              Sentry.configuration.sdk_logger.warn "Could not find job class '#{job_class_name}' for Sentry cron monitoring: #{e.message}"
-              return
-            end
-
-            # Include Sentry::Cron::MonitorCheckIns module for cron monitoring
-            # only patch if not explicitly included in job by user
-            unless job_class.ancestors.include?(Sentry::Cron::MonitorCheckIns)
-              job_class.include(Sentry::Cron::MonitorCheckIns)
-            end
-
-            # Parse cron expression and create monitor config
-            cron_without_tz, timezone = Sentry::GoodJob::CronHelpers::Helpers.parse_cron_with_timezone(cron_expression)
-            monitor_config = Sentry::GoodJob::CronHelpers::Helpers.monitor_config_from_cron(cron_without_tz, timezone: timezone)
-
-            if monitor_config
-              # Configure Sentry cron monitoring - use cron_key as slug for consistency
-              monitor_slug = Sentry::GoodJob::CronHelpers::Helpers.monitor_slug(cron_key)
-
-              job_class.sentry_monitor_check_ins(
-                slug: monitor_slug,
-                monitor_config: monitor_config
-              )
-
-              job_class_name
-            else
-              Sentry.configuration.sdk_logger.warn "Could not create monitor config for #{job_class_name} with cron '#{cron_expression}'"
-              nil
-            end
+          if cron_expression.respond_to?(:call)
+            Sentry.configuration.sdk_logger.warn(
+              "Could not create a Sentry monitor for #{job_class_name}: a callable cron schedule has no static crontab"
+            )
+            return
           end
 
-          # Set up monitoring when the job class is first loaded
-          # This defers constantization until the job is actually needed
-          if defined?(::Rails) && ::Rails.respond_to?(:application) && ::Rails.application
-            ::Rails.application.config.after_initialize do
-              deferred_setup.call
-            end
-          else
-            # Fallback for non-Rails environments
-            deferred_setup.call
+          job_class = begin
+            job_class_name.constantize
+          rescue NameError => e
+            Sentry.configuration.sdk_logger.warn "Could not find job class '#{job_class_name}' for Sentry cron monitoring: #{e.message}"
+            return
           end
 
-          # Return the job name for logging purposes
+          unless job_class.ancestors.include?(Sentry::Cron::MonitorCheckIns)
+            job_class.include(Sentry::Cron::MonitorCheckIns)
+          end
+
+          cron_without_tz, timezone = Sentry::GoodJob::CronHelpers::Helpers.parse_cron_with_timezone(cron_expression)
+          monitor_config = Sentry::GoodJob::CronHelpers::Helpers.monitor_config_from_cron(cron_without_tz, timezone: timezone)
+
+          unless monitor_config
+            Sentry.configuration.sdk_logger.warn "Could not create monitor config for #{job_class_name} with cron '#{cron_expression}'"
+            return
+          end
+
+          monitor_slug = Sentry::GoodJob::CronHelpers::Helpers.monitor_slug(cron_key)
+          job_class.sentry_monitor_check_ins(
+            slug: monitor_slug,
+            monitor_config: monitor_config
+          )
           job_class_name
         end
 
@@ -196,13 +172,65 @@ module Sentry
           return if @reload_hooked
           return unless defined?(::ActiveSupport::Reloader)
 
+          @reload_hooked = true
           ::ActiveSupport::Reloader.to_prepare do
-            @setup_completed = false
+            Sentry::GoodJob::CronHelpers::Integration.reset_setup_state!
+            Sentry::GoodJob::CronHelpers::Integration.setup_monitoring_for_scheduled_jobs
+          end
+        rescue NameError
+          @reload_hooked = false
+          # ActiveSupport::Reloader not available in this environment
+        end
+
+        def self.rails_application?
+          defined?(::Rails) && ::Rails.respond_to?(:application) && ::Rails.application
+        end
+
+        def self.log_empty_cron_skip
+          Sentry.configuration.sdk_logger.warn(
+            "Sentry cron monitors skipped: Good Job cron is empty (#{cron_process_context}). Setup will retry when a schedule is present."
+          )
+        end
+
+        def self.log_cron_scheduler_disabled_if_needed
+          case cron_process_state
+          when :enabled
+            return
+          when :cli_option_unknown
+            Sentry.configuration.sdk_logger.warn(
+              "Sentry cron monitor setup cannot confirm whether Good Job cron runs in this CLI process during Rails boot " \
+              "(#{cron_process_context}). Pass --enable-cron when starting Good Job unless Rails config enables cron."
+            )
+            return
           end
 
-          @reload_hooked = true
-        rescue NameError
-          # ActiveSupport::Reloader not available in this environment
+          Sentry.configuration.sdk_logger.warn(
+            "Sentry cron monitors will not appear until a job check-in runs. Good Job cron is off in this process (#{cron_process_context})."
+          )
+        end
+
+        def self.cron_process_state
+          return :enabled if good_job_config_value(:enable_cron)
+          return :cli_option_unknown if good_job_cli?
+
+          :disabled
+        end
+
+        def self.good_job_cli?
+          defined?(::GoodJob::CLI) && ::GoodJob::CLI.respond_to?(:within_exe?) && ::GoodJob::CLI.within_exe?
+        end
+
+        def self.cron_process_context
+          "process=#{$PROGRAM_NAME} enable_cron=#{good_job_config_value(:enable_cron).inspect} execution_mode=#{good_job_config_value(:execution_mode).inspect}"
+        end
+
+        def self.good_job_config_value(name)
+          return unless rails_application?
+
+          config = ::Rails.application.config.good_job
+          return unless config&.respond_to?(name)
+
+          config.public_send(name)
         end
       end
     end

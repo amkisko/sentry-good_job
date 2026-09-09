@@ -190,13 +190,158 @@ RSpec.describe Sentry::GoodJob::CronHelpers do
           allow(Sentry).to receive(:initialized?).and_return(true)
           Sentry.configuration.good_job.enable_cron_monitors = true
           allow(good_job_config).to receive(:cron).and_return(nil)
+          allow(good_job_config).to receive(:enable_cron).and_return(false)
+          allow(good_job_config).to receive(:execution_mode).and_return(:external)
         end
 
         it "does not set up monitoring" do
           allow(described_class::Integration).to receive(:setup_monitoring_for_job)
+          allow(Sentry.configuration.sdk_logger).to receive(:warn)
+          described_class::Integration.reset_setup_state!
           described_class::Integration.setup_monitoring_for_scheduled_jobs
 
           expect(described_class::Integration).not_to have_received(:setup_monitoring_for_job)
+        end
+      end
+
+      context "when cron config is an empty hash" do
+        let(:job_class) { Class.new(ApplicationJob) }
+
+        before do
+          allow(Sentry).to receive(:initialized?).and_return(true)
+          Sentry.configuration.good_job.enable_cron_monitors = true
+          allow(good_job_config).to receive(:enable_cron).and_return(false)
+          allow(good_job_config).to receive(:execution_mode).and_return(:external)
+          stub_const("TestJob", job_class)
+        end
+
+        it "logs a warning and still applies a later schedule" do
+          allow(good_job_config).to receive(:cron).and_return({})
+          allow(Sentry.configuration.sdk_logger).to receive(:warn)
+          allow(Sentry.configuration.sdk_logger).to receive(:info)
+          described_class::Integration.reset_setup_state!
+
+          described_class::Integration.setup_monitoring_for_scheduled_jobs
+
+          expect(Sentry.configuration.sdk_logger).to have_received(:warn).with(/cron is empty/)
+          expect(Sentry.configuration.sdk_logger).to have_received(:warn).with(/enable_cron/)
+          expect(Sentry.configuration.sdk_logger).to have_received(:warn).with(/execution_mode/)
+
+          allow(good_job_config).to receive(:cron).and_return(
+            "test_job" => {class: "TestJob", cron: "0 * * * *"}
+          )
+          described_class::Integration.setup_monitoring_for_scheduled_jobs
+
+          expect(job_class.ancestors).to include(Sentry::Cron::MonitorCheckIns)
+        end
+      end
+
+      context "when called after initialize with a populated cron hash" do
+        let(:job_class) { Class.new(ApplicationJob) }
+        let(:cron_config) do
+          {
+            "test_job" => {class: "TestJob", cron: "0 * * * *"}
+          }
+        end
+
+        before do
+          allow(Sentry).to receive(:initialized?).and_return(true)
+          Sentry.configuration.good_job.enable_cron_monitors = true
+          allow(good_job_config).to receive(:cron).and_return(cron_config)
+          allow(good_job_config).to receive(:enable_cron).and_return(true)
+          allow(good_job_config).to receive(:execution_mode).and_return(:async)
+          stub_const("TestJob", job_class)
+          allow(Sentry.configuration.sdk_logger).to receive(:info)
+          described_class::Integration.reset_setup_state!
+        end
+
+        it "includes monitor check-ins on the job class" do
+          described_class::Integration.setup_monitoring_for_scheduled_jobs
+
+          expect(job_class.ancestors).to include(Sentry::Cron::MonitorCheckIns)
+        end
+      end
+
+      context "when cron job config uses string keys" do
+        let(:job_class) { Class.new(ApplicationJob) }
+        let(:cron_config) do
+          {
+            "test_job" => {"class" => "TestJob", "cron" => "0 * * * *"}
+          }
+        end
+
+        before do
+          allow(Sentry).to receive(:initialized?).and_return(true)
+          Sentry.configuration.good_job.enable_cron_monitors = true
+          allow(good_job_config).to receive(:cron).and_return(cron_config)
+          allow(good_job_config).to receive(:enable_cron).and_return(true)
+          allow(good_job_config).to receive(:execution_mode).and_return(:async)
+          stub_const("TestJob", job_class)
+          allow(Sentry.configuration.sdk_logger).to receive(:info)
+          described_class::Integration.reset_setup_state!
+        end
+
+        it "includes monitor check-ins on the job class" do
+          described_class::Integration.setup_monitoring_for_scheduled_jobs
+
+          expect(job_class.ancestors).to include(Sentry::Cron::MonitorCheckIns)
+        end
+      end
+
+      context "when Good Job cron will not run in this process" do
+        let(:cron_config) do
+          {
+            "test_job" => {class: "TestJob", cron: "0 * * * *"}
+          }
+        end
+
+        before do
+          allow(Sentry).to receive(:initialized?).and_return(true)
+          Sentry.configuration.good_job.enable_cron_monitors = true
+          allow(good_job_config).to receive(:cron).and_return(cron_config)
+          allow(good_job_config).to receive(:enable_cron).and_return(false)
+          allow(good_job_config).to receive(:execution_mode).and_return(:external)
+          allow(Sentry.configuration.sdk_logger).to receive(:info)
+          allow(Sentry.configuration.sdk_logger).to receive(:warn)
+          described_class::Integration.reset_setup_state!
+        end
+
+        it "logs that monitors appear after a check-in" do
+          allow(described_class::Integration).to receive(:setup_monitoring_for_job).and_return("TestJob")
+
+          described_class::Integration.setup_monitoring_for_scheduled_jobs
+
+          expect(Sentry.configuration.sdk_logger).to have_received(:warn).with(/will not appear until a job check-in runs/)
+          expect(Sentry.configuration.sdk_logger).to have_received(:warn).with(/enable_cron/)
+          expect(Sentry.configuration.sdk_logger).to have_received(:warn).with(/execution_mode/)
+        end
+      end
+
+      context "when Good Job cron enablement depends on CLI options" do
+        let(:cron_config) do
+          {
+            "test_job" => {class: "TestJob", cron: "0 * * * *"}
+          }
+        end
+
+        before do
+          allow(Sentry).to receive(:initialized?).and_return(true)
+          Sentry.configuration.good_job.enable_cron_monitors = true
+          allow(good_job_config).to receive(:cron).and_return(cron_config)
+          allow(good_job_config).to receive(:enable_cron).and_return(false)
+          allow(good_job_config).to receive(:execution_mode).and_return(:external)
+          allow(GoodJob::CLI).to receive(:within_exe?).and_return(true)
+          allow(described_class::Integration).to receive(:setup_monitoring_for_job).and_return("TestJob")
+          allow(Sentry.configuration.sdk_logger).to receive(:info)
+          allow(Sentry.configuration.sdk_logger).to receive(:warn)
+          described_class::Integration.reset_setup_state!
+        end
+
+        it "warns that cron enablement cannot be confirmed during Rails boot" do
+          described_class::Integration.setup_monitoring_for_scheduled_jobs
+
+          expect(Sentry.configuration.sdk_logger).to have_received(:warn).with(/cannot confirm whether Good Job cron runs/)
+          expect(Sentry.configuration.sdk_logger).to have_received(:warn).with(/--enable-cron/)
         end
       end
 
@@ -212,6 +357,8 @@ RSpec.describe Sentry::GoodJob::CronHelpers do
           allow(Sentry).to receive(:initialized?).and_return(true)
           Sentry.configuration.good_job.enable_cron_monitors = true
           allow(good_job_config).to receive(:cron).and_return(cron_config)
+          allow(good_job_config).to receive(:enable_cron).and_return(true)
+          allow(good_job_config).to receive(:execution_mode).and_return(:async)
         end
 
         it "sets up monitoring for each job" do
@@ -254,8 +401,6 @@ RSpec.describe Sentry::GoodJob::CronHelpers do
 
         it "logs a warning and returns" do
           allow(Sentry.configuration.sdk_logger).to receive(:warn)
-          # Mock Rails.application.config.after_initialize to execute immediately
-          allow(Rails.application.config).to receive(:after_initialize).and_yield
 
           described_class::Integration.setup_monitoring_for_job("test_job", job_config)
 
@@ -291,7 +436,6 @@ RSpec.describe Sentry::GoodJob::CronHelpers do
         it "includes monitor check-ins module" do
           allow(job_class).to receive(:include)
           allow(job_class).to receive(:sentry_monitor_check_ins)
-          allow(Rails.application.config).to receive(:after_initialize).and_yield
           described_class::Integration.setup_monitoring_for_job("test_job", job_config)
 
           expect(job_class).to have_received(:include).with(Sentry::Cron::MonitorCheckIns).at_least(:once)
@@ -300,8 +444,6 @@ RSpec.describe Sentry::GoodJob::CronHelpers do
         it "sets up cron monitoring with proper configuration" do
           allow(job_class).to receive(:include)
           allow(job_class).to receive(:sentry_monitor_check_ins)
-          # Mock Rails.application.config.after_initialize to execute immediately
-          allow(Rails.application.config).to receive(:after_initialize).and_yield
           described_class::Integration.setup_monitoring_for_job("test_job", job_config)
 
           expect(job_class).to have_received(:sentry_monitor_check_ins)
@@ -310,12 +452,25 @@ RSpec.describe Sentry::GoodJob::CronHelpers do
         it "returns the job name when setup is successful" do
           allow(job_class).to receive(:include)
           allow(job_class).to receive(:sentry_monitor_check_ins)
-          # Mock Rails.application.config.after_initialize to execute immediately
-          allow(Rails.application.config).to receive(:after_initialize).and_yield
 
           result = described_class::Integration.setup_monitoring_for_job("test_job", job_config)
 
           expect(result).to eq("TestJob")
+        end
+      end
+
+      context "when the cron schedule is callable" do
+        let(:job_config) { {class: "TestJob", cron: ->(last_ran) { last_ran }} }
+
+        it "skips static monitoring without raising during initialization" do
+          allow(Sentry.configuration.sdk_logger).to receive(:warn)
+
+          expect do
+            described_class::Integration.setup_monitoring_for_job("test_job", job_config)
+          end.not_to raise_error
+
+          expect(job_class.ancestors).not_to include(Sentry::Cron::MonitorCheckIns)
+          expect(Sentry.configuration.sdk_logger).to have_received(:warn).with(/callable cron schedule/)
         end
       end
     end
@@ -372,20 +527,47 @@ RSpec.describe Sentry::GoodJob::CronHelpers do
     end
 
     describe ".attach_reload_hook_if_available" do
-      it "resets setup state on reload when ActiveSupport::Reloader is present" do
+      it "reattaches monitoring to reloaded job classes" do
         reloader = Class.new do
+          class << self
+            attr_reader :prepare_callback
+          end
+
           def self.to_prepare(&block)
-            block.call
+            @prepare_callback = block
+          end
+
+          def self.prepare!
+            new.instance_exec(&prepare_callback)
           end
         end
         stub_const("ActiveSupport::Reloader", reloader)
 
-        described_class::Integration.instance_variable_set(:@setup_completed, true)
+        first_job_class = Class.new(ApplicationJob)
+        stub_const("ReloadSpecJobs", Module.new)
+        stub_const("ReloadSpecJobs::ReloadedJob", first_job_class)
+
+        allow(Sentry).to receive(:initialized?).and_return(true)
+        Sentry.configuration.good_job.enable_cron_monitors = true
+        allow(good_job_config).to receive(:cron).and_return(
+          "reloaded_job" => {class: "ReloadSpecJobs::ReloadedJob", cron: "0 * * * *"}
+        )
+        allow(good_job_config).to receive(:enable_cron).and_return(true)
+        allow(good_job_config).to receive(:execution_mode).and_return(:async)
+        allow(Sentry.configuration.sdk_logger).to receive(:info)
         described_class::Integration.instance_variable_set(:@reload_hooked, false)
+        described_class::Integration.reset_setup_state!
 
-        described_class::Integration.attach_reload_hook_if_available
+        described_class::Integration.setup_monitoring_for_scheduled_jobs
 
-        expect(described_class::Integration.instance_variable_get(:@setup_completed)).to be(false)
+        expect(first_job_class.ancestors).to include(Sentry::Cron::MonitorCheckIns)
+
+        reloaded_job_class = Class.new(ApplicationJob)
+        stub_const("ReloadSpecJobs::ReloadedJob", reloaded_job_class)
+
+        reloader.prepare!
+
+        expect(reloaded_job_class.ancestors).to include(Sentry::Cron::MonitorCheckIns)
       end
     end
   end
