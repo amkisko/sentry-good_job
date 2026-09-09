@@ -6,7 +6,7 @@ Recorded 2026-09-09. Cron monitor setup now applies mixins during Railtie after-
 
 ## Decisions
 
-- Keep VERSION at 7.0.0 until the next release. Put operator-visible bullets under Unreleased in CHANGELOG.md.
+- Cut the cron setup work as sentry-good_job 7.0.1. 7.0.0 is already on RubyGems and tagged.
 - README states monitors are created or updated on the first check-in. enable_cron_monitors is not a substitute for config.good_job.enable_cron = true or good_job start --enable-cron.
 - Callable schedules remain owned by Good Job and do not receive a static Sentry monitor configuration.
 - Rails prepare repeats monitor setup after class reloads. Good Job CLI state remains unknown during Rails boot unless Rails config enables cron.
@@ -24,7 +24,12 @@ Recorded 2026-09-09. Cron monitor setup now applies mixins during Railtie after-
 - Observed after audit fixes: RBENV_VERSION=3.4.10 rbenv exec bundle exec rubocop, 26 files, no offenses.
 - Observed after audit fixes: RBENV_VERSION=3.4.10 rbenv exec bundle exec polyrun parallel-rspec --workers 5 --merge-failures -- rspec, 5 workers, exit 0.
 - Observed after audit fixes: RBENV_VERSION=3.4.10 rbenv exec bundle exec rspec spec/integration, 1 pending because sqlite3 is not in the default Gemfile.
-- Cut Unreleased into the next version heading at release.
+- VERSION is 7.0.1. CHANGELOG.md heading is 7.0.1 dated 2026-09-09.
+- Observed on prepare: RBENV_VERSION=3.4.10 rbenv exec bundle exec rspec spec/sentry/good_job_spec.rb spec/sentry/good_job/cron_helpers_spec.rb, 50 examples, 0 failures.
+- Observed on prepare: RBENV_VERSION=3.4.10 rbenv exec bundle exec rubocop, 26 files, no offenses.
+- Observed on prepare: RBENV_VERSION=3.4.10 rbenv exec bundle exec polyrun parallel-rspec --workers 5 --merge-failures -- rspec, 5 workers, exit 0.
+- Observed on prepare: RBENV_VERSION=3.4.10 rbenv exec bundle exec rspec spec/integration, 1 pending because sqlite3 is not in the default Gemfile.
+- Remaining: commit on main, then make release to publish. Do not gem push from this prepare pass.
 
 ## Source
 

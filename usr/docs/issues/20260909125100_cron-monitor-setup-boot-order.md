@@ -1,4 +1,4 @@
-Recorded 2026-09-09. Library gem. Cron monitor setup skipped empty hashes without a log, nested a second after-initialize hook, and read only symbol keys. Stay on main. No release in this pass.
+Recorded 2026-09-09. Library gem. Cron monitor setup skipped empty hashes without a log, nested a second after-initialize hook, and read only symbol keys. Stay on main. Cut as 7.0.1.
 
 ## Participants
 
@@ -34,7 +34,12 @@ Recorded 2026-09-09. Library gem. Cron monitor setup skipped empty hashes withou
 - Observed after audit fixes: RBENV_VERSION=3.4.10 rbenv exec bundle exec rubocop, 26 files, no offenses.
 - Observed after audit fixes: RBENV_VERSION=3.4.10 rbenv exec bundle exec polyrun parallel-rspec --workers 5 --merge-failures -- rspec, 5 workers, exit 0.
 - Observed after audit fixes: RBENV_VERSION=3.4.10 rbenv exec bundle exec rspec spec/integration, 1 pending because sqlite3 is not in the default Gemfile.
-- Distill Unreleased CHANGELOG.md bullets at the next gem release.
+- VERSION is 7.0.1. CHANGELOG.md heading is 7.0.1 dated 2026-09-09.
+- Observed on prepare: RBENV_VERSION=3.4.10 rbenv exec bundle exec rspec spec/sentry/good_job_spec.rb spec/sentry/good_job/cron_helpers_spec.rb, 50 examples, 0 failures.
+- Observed on prepare: RBENV_VERSION=3.4.10 rbenv exec bundle exec rubocop, 26 files, no offenses.
+- Observed on prepare: RBENV_VERSION=3.4.10 rbenv exec bundle exec polyrun parallel-rspec --workers 5 --merge-failures -- rspec, 5 workers, exit 0.
+- Observed on prepare: RBENV_VERSION=3.4.10 rbenv exec bundle exec rspec spec/integration, 1 pending because sqlite3 is not in the default Gemfile.
+- Remaining: commit on main, then make release to publish. Do not gem push from this prepare pass.
 
 ## Source
 

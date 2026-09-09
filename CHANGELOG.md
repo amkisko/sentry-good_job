@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 7.0.1 (2026-09-09)
 
 - Warn when Good Job cron is empty while leaving setup available for a later reload
 - Attach cron monitors when Rails finishes booting and reattach them when job classes reload
