@@ -159,8 +159,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.7)
-    rspec_junit_formatter (0.6.0)
-      rspec-core (>= 2, < 4, != 2.12.0)
     rubocop (1.88.2)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -240,10 +238,14 @@ PLATFORMS
 DEPENDENCIES
   appraisal (~> 2)
   bundler (>= 2)
+  crass (>= 1.0.7)
+  erb (>= 6.0.4)
+  loofah (>= 2.25.2)
   polyrun (>= 2.2.0)
+  rack (>= 3.2.6)
+  railties (>= 8.0.4.1)
   rake (~> 13.0)
   rspec (~> 3)
-  rspec_junit_formatter (~> 0.6)
   rubocop-rspec (~> 3.8)
   rubocop-thread_safety (~> 0.7)
   sentry-good_job!
@@ -257,4 +259,4 @@ RUBY VERSION
    ruby 3.4.7p58
 
 BUNDLED WITH
-   2.7.2
+   2.5.9

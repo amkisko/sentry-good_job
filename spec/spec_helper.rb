@@ -34,6 +34,8 @@ require "logger"
 
 require "sentry-good_job"
 
+Dir[File.expand_path("support/**/*.rb", __dir__)].sort.each { |f| require_relative f }
+
 DUMMY_DSN = "http://12345:67890@sentry.localdomain/sentry/42"
 
 RSpec.configure do |config|
