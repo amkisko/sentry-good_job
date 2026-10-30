@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.0.2 (2026-10-30)
+
+- Fail closed when release confirmation input reaches EOF
+- Require a matching `CHANGELOG.md` version heading before `gem push`
+
 ## 7.0.1 (2026-09-09)
 
 - Warn when Good Job cron is empty while leaving setup available for a later reload

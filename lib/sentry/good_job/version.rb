@@ -2,6 +2,6 @@
 
 module Sentry
   module GoodJob
-    VERSION = "7.0.1"
+    VERSION = "7.0.2"
   end
 end

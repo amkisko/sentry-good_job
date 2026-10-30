@@ -2,7 +2,7 @@ Recorded 2026-09-09. Cron monitor setup now applies mixins during Railtie after-
 
 ## Participants
 
-- amkisko
+Andrei Makarov (@amkisko)
 
 ## Decisions
 

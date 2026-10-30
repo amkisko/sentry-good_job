@@ -9,35 +9,12 @@ module Sentry
     module ActiveJobExtensions
       # Enhance sentry-rails ActiveJob context with GoodJob-specific data
       def self.enhance_sentry_context(job, base_context)
-        return base_context unless job.respond_to?(:queue_name) && job.respond_to?(:executions)
-
-        # Add GoodJob-specific context to the existing sentry-rails context
-        good_job_context = {
-          queue_name: job.queue_name,
-          executions: job.executions,
-          enqueued_at: job.enqueued_at,
-          priority: job.respond_to?(:priority) ? job.priority : nil
-        }
-
-        # Merge with base context, preserving existing structure
-        base_context.merge(good_job: good_job_context)
+        ContextHelpers.add_context(job, base_context)
       end
 
       # Enhance sentry-rails ActiveJob tags with GoodJob-specific data
       def self.enhance_sentry_tags(job, base_tags)
-        return base_tags unless job.respond_to?(:queue_name) && job.respond_to?(:executions)
-
-        good_job_tags = {
-          queue_name: job.queue_name,
-          executions: job.executions
-        }
-
-        # Add priority if available
-        if job.respond_to?(:priority)
-          good_job_tags[:priority] = job.priority
-        end
-
-        base_tags.merge(good_job_tags)
+        ContextHelpers.add_tags(job, base_tags)
       end
 
       # Set up GoodJob-specific ActiveJob extensions

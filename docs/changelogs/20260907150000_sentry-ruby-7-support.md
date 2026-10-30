@@ -2,7 +2,7 @@ Recorded 2026-09-07. sentry-good_job 7.0.0 requires sentry-ruby 7 and skips a ne
 
 ## Participants
 
-- amkisko
+Andrei Makarov (@amkisko)
 
 ## Decisions
 

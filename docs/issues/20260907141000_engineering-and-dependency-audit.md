@@ -2,7 +2,7 @@ Recorded 2026-09-07. Library gem. Scheduled CI bundler-audit failed on json CVE-
 
 ## Participants
 
-- amkisko
+Andrei Makarov (@amkisko)
 
 ## Decisions
 

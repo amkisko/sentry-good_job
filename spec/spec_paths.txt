@@ -1,3 +1,4 @@
+spec/release_version_check_spec.rb
 spec/sentry/compatibility_spec.rb
 spec/sentry/good_job/active_job_extensions_spec.rb
 spec/sentry/good_job/configuration_spec.rb

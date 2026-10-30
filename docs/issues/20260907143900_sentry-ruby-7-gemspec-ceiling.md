@@ -2,7 +2,7 @@ Recorded 2026-09-07. Library gem. Claims audit, dependency recon, and sentry-rub
 
 ## Participants
 
-- amkisko
+Andrei Makarov (@amkisko)
 
 ## Decisions
 

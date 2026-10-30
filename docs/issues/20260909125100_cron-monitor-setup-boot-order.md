@@ -2,7 +2,7 @@ Recorded 2026-09-09. Library gem. Cron monitor setup skipped empty hashes withou
 
 ## Participants
 
-- amkisko
+Andrei Makarov (@amkisko)
 
 ## Decisions
 

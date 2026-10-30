@@ -2,7 +2,7 @@ Recorded 2026-09-07. After 7.0.0 shipped, CI bundler-audit still failed on the d
 
 ## Participants
 
-- amkisko
+Andrei Makarov (@amkisko)
 
 ## Decisions
 
