@@ -12,11 +12,6 @@ module Sentry
         ContextHelpers.add_context(job, base_context)
       end
 
-      # Enhance sentry-rails ActiveJob tags with GoodJob-specific data
-      def self.enhance_sentry_tags(job, base_tags)
-        ContextHelpers.add_tags(job, base_tags)
-      end
-
       # Set up GoodJob-specific ActiveJob extensions
       def self.setup
         return unless defined?(::Rails) && ::Sentry.initialized?
@@ -89,21 +84,16 @@ module Sentry
 
         private
 
-        # Override _sentry_set_span_data to add GoodJob-specific functionality
+        # Span fields for this gem's enqueue fallback when sentry-rails
+        # record_producer_span is absent. A class-level override of this method
+        # shadows the helper; Concern include on ActiveJob::Base cannot wrap it.
         def _sentry_set_span_data(span, job, retry_count: nil)
           return unless span
 
-          # Call the base implementation if it exists (from sentry-rails)
-          if respond_to?(:_sentry_set_span_data, true) && method(:_sentry_set_span_data).super_method
-            super
-          else
-            # Fallback: implement base functionality directly
-            span.set_data("messaging.message.id", job.job_id)
-            span.set_data("messaging.destination.name", job.queue_name) if job.respond_to?(:queue_name)
-            span.set_data("messaging.message.retry.count", retry_count) if retry_count
-          end
+          span.set_data("messaging.message.id", job.job_id)
+          span.set_data("messaging.destination.name", job.queue_name) if job.respond_to?(:queue_name)
+          span.set_data("messaging.message.retry.count", retry_count) if retry_count
 
-          # Add GoodJob-specific span data (latency)
           latency = calculate_job_latency(job)
           span.set_data("messaging.message.receive.latency", latency) if latency
         end

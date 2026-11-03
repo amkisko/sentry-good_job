@@ -16,12 +16,11 @@ RSpec.describe Sentry::GoodJob do
   end
 
   it "has the correct version" do
-    expect(described_class::VERSION).to eq("7.0.2")
+    expect(described_class::VERSION).to eq("7.0.3")
   end
 
   describe "setup_good_job_integration" do
     before do
-      # Mock Rails application configuration
       rails_app = double("Rails::Application")
       rails_config = double("Rails::Configuration")
       good_job_config = double("GoodJob::Configuration")
@@ -32,8 +31,8 @@ RSpec.describe Sentry::GoodJob do
       allow(good_job_config).to receive(:cron).and_return({})
     end
 
-    it "does not automatically set up job monitoring for any specific job class" do
-      # The integration now only sets up cron monitoring, not custom job monitoring
+    it "sets up cron monitoring when enable_cron_monitors is true" do
+      Sentry.configuration.good_job.enable_cron_monitors = true
       allow(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
 
       described_class.setup_good_job_integration
@@ -41,40 +40,13 @@ RSpec.describe Sentry::GoodJob do
       expect(Sentry::GoodJob::CronHelpers::Integration).to have_received(:setup_monitoring_for_scheduled_jobs)
     end
 
-    it "sets up cron monitoring when enabled" do
+    it "skips cron monitoring when enable_cron_monitors is false" do
+      Sentry.configuration.good_job.enable_cron_monitors = false
       allow(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
 
       described_class.setup_good_job_integration
 
-      expect(Sentry::GoodJob::CronHelpers::Integration).to have_received(:setup_monitoring_for_scheduled_jobs)
-    end
-
-    context "when enable_cron_monitors is enabled" do
-      before do
-        Sentry.configuration.good_job.enable_cron_monitors = true
-      end
-
-      it "sets up cron monitoring" do
-        allow(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
-
-        described_class.setup_good_job_integration
-
-        expect(Sentry::GoodJob::CronHelpers::Integration).to have_received(:setup_monitoring_for_scheduled_jobs)
-      end
-    end
-
-    context "when enable_cron_monitors is disabled" do
-      before do
-        Sentry.configuration.good_job.enable_cron_monitors = false
-      end
-
-      it "does not set up cron monitoring" do
-        allow(Sentry::GoodJob::CronHelpers::Integration).to receive(:setup_monitoring_for_scheduled_jobs)
-
-        described_class.setup_good_job_integration
-
-        expect(Sentry::GoodJob::CronHelpers::Integration).not_to have_received(:setup_monitoring_for_scheduled_jobs)
-      end
+      expect(Sentry::GoodJob::CronHelpers::Integration).not_to have_received(:setup_monitoring_for_scheduled_jobs)
     end
   end
 
@@ -88,26 +60,6 @@ RSpec.describe Sentry::GoodJob do
       described_class.capture_exception(exception, **options)
 
       expect(Sentry).to have_received(:capture_exception).with(exception, **options)
-    end
-  end
-
-  describe "Rails integration" do
-    before do
-      # Mock Rails configuration
-      rails_config = double("Rails::Configuration")
-      allow(rails_config).to receive(:good_job).and_return(double("GoodJobConfig"))
-
-      # Mock Sentry Rails configuration
-      sentry_rails_config = double("Sentry::Rails::Configuration")
-      allow(sentry_rails_config).to receive(:skippable_job_adapters).and_return([])
-
-      allow(Sentry.configuration).to receive(:rails).and_return(sentry_rails_config)
-    end
-
-    it "adds GoodJobAdapter to skippable_job_adapters" do
-      # This test verifies that the integration would add the adapter to the skippable list
-      # In a real Rails environment, this would be done by the Railtie
-      expect(Sentry.configuration.rails.skippable_job_adapters).to be_an(Array)
     end
   end
 end

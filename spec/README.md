@@ -33,8 +33,8 @@ See `polyrun.yml` and `config/polyrun_coverage.yml`.
 
 ## Layout
 
-- `spec/sentry/` — unit specs for configuration, helpers, and instrumentation
-- `spec/integration/` — Rails + GoodJob integration (runs serially after the parallel suite)
+- `spec/sentry/` - unit specs for configuration, helpers, and instrumentation
+- `spec/integration/` - Rails + GoodJob integration (runs serially after the parallel suite)
 
 ## Guidelines
 

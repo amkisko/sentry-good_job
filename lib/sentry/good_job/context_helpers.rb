@@ -22,7 +22,8 @@ module Sentry
         base_context.merge(good_job: good_job_context)
       end
 
-      # Add GoodJob-specific information to the existing Sentry Rails tags
+      # Manual helper for hosts that set Sentry tags themselves.
+      # Setup does not call this; sentry-rails has no tags enhancement hook.
       def self.add_tags(job, base_tags = {})
         return base_tags unless job.respond_to?(:queue_name) && job.respond_to?(:executions)
 
@@ -31,7 +32,6 @@ module Sentry
           executions: job.executions
         }
 
-        # Add priority if available
         if job.respond_to?(:priority)
           good_job_tags[:priority] = job.priority
         end

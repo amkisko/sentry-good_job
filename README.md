@@ -16,11 +16,9 @@
 [![Gem](https://img.shields.io/gem/dt/sentry-good_job.svg)](https://rubygems.org/gems/sentry-good_job/)
 [![SemVer](https://api.dependabot.com/badges/compatibility_score?dependency-name=sentry-good_job&package-manager=bundler&version-scheme=semver)](https://dependabot.com/compatibility-score.html?dependency-name=sentry-good_job&package-manager=bundler&version-scheme=semver)
 
-This gem provides the GoodJob integration for the [Sentry](https://sentry.io) Ruby SDK.
+Good Job integration for the [Sentry](https://sentry.io) Ruby SDK. Requires `sentry-ruby`, `sentry-rails`, and `good_job`.
 
-## Getting Started
-
-### Install
+## Install
 
 ```ruby
 gem "sentry-ruby"
@@ -29,28 +27,25 @@ gem "good_job"
 gem "sentry-good_job"
 ```
 
-Then you're all set! `sentry-good_job` will automatically capture exceptions from your ActiveJob workers when using Good Job as the backend!
+With `:good_job` in `enabled_patches`, the railtie wires exception capture through sentry-rails, adds Good Job fields to Sentry context, and can register cron monitors from `config.good_job.cron`.
 
 ## Features
 
-- **Automatic Error Capture**: Captures exceptions from ActiveJob workers using Good Job
-- **Performance Monitoring**: Tracks job execution times and performance metrics
-- **Cron Monitoring**: Automatic setup for scheduled jobs with cron monitoring
-- **Context Preservation**: Maintains user context and trace propagation across job executions
-- **Configurable Reporting**: Control when errors are reported (after retries, only dead jobs, etc.)
-- **Rails Integration**: Seamless integration with Rails applications
+- Exception capture for ActiveJob workers that use Good Job (via sentry-rails)
+- Job execution spans and queue latency when this gem records the enqueue span
+- Cron monitor registration from Good Job scheduled jobs
+- User context and trace propagation from sentry-rails
+- Reporting after retries controlled by sentry-rails ActiveJob options
 
 ## Configuration
 
-The integration can be configured through Sentry's configuration:
-
 ```ruby
 Sentry.init do |config|
-  config.dsn = 'your-dsn-here'
-  
+  config.dsn = "your-dsn-here"
+
   # Good Job specific configuration
   config.good_job.enable_cron_monitors = true
-  
+
   # ActiveJob configuration (handled by sentry-rails)
   config.rails.active_job_report_on_retry_error = false
   config.data_collection.queues = false
@@ -64,47 +59,49 @@ end
 
 #### Good Job Specific Options
 
-- `enable_cron_monitors` (default: `true`): Enable cron monitoring for scheduled jobs
+- `enable_cron_monitors` (default: `true`): Register cron monitors for scheduled jobs
 
 #### ActiveJob Options (handled by sentry-rails)
 
-- `config.rails.active_job_report_on_retry_error` (default: `false`): Only report errors after all retry attempts are exhausted
-- `config.data_collection.queues` (default: `true`): Include job arguments in error context (be careful with sensitive data)
-- `config.sdk_logger` (default: `nil`): Configure the SDK logger for custom logging needs (general Sentry configuration)
+- `config.rails.active_job_report_on_retry_error` (default: `false`): Report errors only after retries are exhausted
+- `config.data_collection.queues` (default: `true`): Include job arguments in error context (sensitive data risk)
+- `config.sdk_logger` (default: `nil`): SDK logger for setup and cron warnings
 
-**Note**: The Good Job integration now leverages sentry-rails for core ActiveJob functionality, including trace propagation, user context preservation, and error reporting. This provides better integration and reduces duplication.
+Core ActiveJob capture, trace propagation, and user context come from sentry-rails. This gem adds Good Job cron monitors and extra job context (`queue_name`, `executions`, `enqueued_at`, `priority`).
 
 ## Usage
 
 ### Automatic Setup
 
-The integration works automatically once installed. It will:
+Once installed and enabled, the integration:
 
-1. **Capture exceptions** from ActiveJob workers using sentry-rails
-2. **Set up performance monitoring** for job execution with enhanced GoodJob-specific metrics
-3. **Automatically configure cron monitoring** for scheduled jobs
-4. **Preserve user context and trace propagation** across job executions
-5. **Add GoodJob-specific context** including queue name, executions, priority, and latency
+1. Captures exceptions from ActiveJob workers through sentry-rails
+2. Records performance spans for job execution; adds queue latency on this gem's enqueue span fallback
+3. Registers cron monitors for scheduled jobs from Good Job config
+4. Keeps user context and trace headers from sentry-rails
+5. Merges Good Job context (`queue_name`, `executions`, `priority`, `enqueued_at`) into `sentry_context`
+
+`ContextHelpers.add_tags` is available for hosts that set tags themselves. Setup does not call it; sentry-rails has no tags enhancement hook.
 
 ### Cron Monitoring
 
-For scheduled jobs, cron monitoring is automatically set up based on your Good Job configuration:
+Cron monitors follow your Good Job schedule:
 
 ```ruby
 # config/application.rb
 config.good_job.cron = {
-  'my_scheduled_job' => {
-    class: 'MyScheduledJob',
-    cron: '0 * * * *' # Every hour
+  "my_scheduled_job" => {
+    class: "MyScheduledJob",
+    cron: "0 * * * *" # Every hour
   }
 }
 ```
 
 Sentry creates or updates monitors on the first check-in. `enable_cron_monitors` registers check-ins on job classes. It is not a substitute for `config.good_job.enable_cron = true` or `good_job start --enable-cron`.
 
-Callable Good Job cron schedules continue to run, but this integration skips Sentry monitor configuration for them because they do not provide a static crontab.
+Callable Good Job cron schedules still run. This integration skips Sentry monitor configuration for them because they have no static crontab.
 
-You can also manually set up cron monitoring:
+Manual cron monitoring:
 
 ```ruby
 class MyScheduledJob < ApplicationJob
@@ -119,28 +116,27 @@ end
 
 ### Custom Error Handling
 
-The integration respects ActiveJob's retry configuration and will only report errors based on your settings:
+Reporting follows ActiveJob retries and sentry-rails settings:
 
 ```ruby
 class MyJob < ApplicationJob
   retry_on StandardError, wait: :exponentially_longer, attempts: 3
-  
+
   def perform
-    # This will only be reported to Sentry after 3 attempts if active_job_report_on_retry_error is true
+    # Reported after 3 attempts when active_job_report_on_retry_error is true
     raise "Something went wrong"
   end
 end
 ```
 
-### Debugging and Detailed Logging
+### Debugging and Logging
 
-The integration uses the standard Sentry SDK logger (`Sentry.configuration.sdk_logger`) for all logging needs. You can configure this logger to get detailed information about what the integration is doing:
+Use `Sentry.configuration.sdk_logger`:
 
 ```ruby
 Sentry.init do |config|
-  config.dsn = 'your-dsn-here'
-  
-  # Configure the SDK logger for debugging
+  config.dsn = "your-dsn-here"
+
   config.sdk_logger = Logger.new($stdout)
   config.sdk_logger.level = Logger::DEBUG
 
@@ -150,45 +146,30 @@ Sentry.init do |config|
 end
 ```
 
-#### Log Levels
+Log levels:
 
-The integration logs at different levels:
-- **INFO**: Integration setup, cron monitoring configuration, job monitoring setup
-- **WARN**: Configuration issues, missing job classes, cron parsing errors
-- **DEBUG**: Detailed execution flow (when debug level is enabled)
+- INFO: Integration setup, cron monitoring configuration, job monitoring setup
+- WARN: Configuration issues, missing job classes, cron parsing errors
+- DEBUG: Detailed execution flow when debug level is enabled
 
-#### What Gets Logged
-
-When logging is enabled, you'll see information about:
-- Job execution start and completion
-- Error capture and reporting decisions
-- Cron monitoring setup and configuration
-- Performance metrics collection
-- GoodJob-specific context enhancement
-- Integration initialization and setup
+Typical messages cover cron monitor setup, missing job classes, cron parse failures, and integration initialization. Job execute start/complete and capture decisions come from sentry-rails when that logger is shared.
 
 ## Performance Monitoring
 
-When performance monitoring is enabled, the integration will track:
+When performance monitoring is enabled:
 
-- Job execution time
-- Queue latency (GoodJob-specific)
+- Job execution time (sentry-rails / Sentry spans)
+- Queue latency on this gem's enqueue-span fallback (skipped when sentry-rails `record_producer_span` is present)
 - Retry counts
-- Job context and metadata
-- GoodJob-specific metrics (queue name, executions, priority)
+- Good Job context fields: queue name, executions, priority
 
 ## Error Context
 
-The integration automatically adds relevant context to error reports:
+Merged into error reports:
 
-- Job class name
-- Job ID
-- Queue name (GoodJob-specific)
-- Execution count (GoodJob-specific)
-- Priority (GoodJob-specific)
-- Enqueued and scheduled timestamps
-- Job arguments (if enabled via `config.data_collection.queues`)
-- Latency metrics (GoodJob-specific)
+- Job class name, job ID, locale, scheduled_at (sentry-rails)
+- Queue name, execution count, priority, enqueued_at (this gem under `good_job`)
+- Job arguments when `config.data_collection.queues` is enabled
 
 ## Compatibility
 
@@ -198,7 +179,7 @@ The integration automatically adds relevant context to error reports:
 
 ## Contributing
 
-We welcome contributions! Please see our [contributing guidelines](./CONTRIBUTING.md) for details.
+See [contributing guidelines](./CONTRIBUTING.md).
 
 ## Links
 

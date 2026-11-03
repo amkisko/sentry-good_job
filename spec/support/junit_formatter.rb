@@ -1,6 +1,6 @@
 require "polyrun/reporting/rspec_junit"
 
-# CI: RSpec JSON → JUnit XML (single-process runs). When Polyrun sets POLYRUN_SHARD_INDEX (parallel-rspec
+# CI: RSpec JSON -> JUnit XML (single-process runs). When Polyrun sets POLYRUN_SHARD_INDEX (parallel-rspec
 # workers), emit JSON only to tmp/rspec-<shard>.json so the merge job can run report-junit on tmp/rspec-*.json.
 if ENV["CI"]
   if ENV["POLYRUN_SHARD_INDEX"]

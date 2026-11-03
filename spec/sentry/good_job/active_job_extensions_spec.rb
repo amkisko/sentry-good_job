@@ -28,25 +28,6 @@ RSpec.describe Sentry::GoodJob::ActiveJobExtensions do
     end
   end
 
-  describe ".enhance_sentry_tags" do
-    it "adds GoodJob tags when job exposes GoodJob attributes", :aggregate_failures do
-      job = Struct.new(:queue_name, :executions, :priority).new("critical", 3, 10)
-      base = {existing: "tag"}
-
-      result = described_class.enhance_sentry_tags(job, base)
-
-      expect(result).to include(queue_name: "critical", executions: 3, priority: 10, existing: "tag")
-    end
-
-    it "returns base tags when job lacks GoodJob attributes" do
-      base = {existing: "tag"}
-
-      result = described_class.enhance_sentry_tags(double("Job"), base)
-
-      expect(result).to eq(base)
-    end
-  end
-
   describe "around_enqueue hook" do
     it "creates a span with GoodJob-specific data when Sentry is initialized", :aggregate_failures do
       job = HappyJob.new
@@ -92,30 +73,6 @@ RSpec.describe Sentry::GoodJob::ActiveJobExtensions do
       expect(span).to have_received(:set_data).with("messaging.destination.name", job.queue_name)
       expect(span).to have_received(:set_data).with("messaging.message.retry.count", 3)
       expect(span).to have_received(:set_data).with("messaging.message.receive.latency", 1000)
-    end
-
-    it "calls the super implementation when present while preserving GoodJob data", :aggregate_failures do
-      base_class = Class.new(ApplicationJob) do
-        attr_accessor :enqueued_at
-
-        def _sentry_set_span_data(span, job, retry_count: nil)
-          span.set_data("base", true)
-        end
-      end
-
-      subclass = Class.new(base_class) do
-        include Sentry::GoodJob::ActiveJobExtensions::GoodJobExtensions
-      end
-
-      job = subclass.new
-      job.enqueued_at = Time.at(0)
-
-      span = instance_double(Sentry::Span, set_data: nil)
-      allow(Time).to receive(:now).and_return(Time.at(1))
-
-      job.send(:_sentry_set_span_data, span, job, retry_count: 1)
-
-      expect(span).to have_received(:set_data).with("base", true)
     end
 
     it "returns early when span is nil" do
