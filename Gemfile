@@ -5,7 +5,8 @@ source "https://rubygems.org"
 gemspec
 
 # Test-graph floors for bundler-audit. Not published gemspec dependencies.
-gem "railties", ">= 8.1.4"
+# Keep railties >= 8.0.4.1 so the rails8 appraisal (rails ~> 8.0.4) can resolve.
+gem "railties", ">= 8.0.4.1"
 gem "rack", ">= 3.2.8"
 gem "loofah", ">= 2.25.2"
 gem "crass", ">= 1.0.8"
