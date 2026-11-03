@@ -22,6 +22,8 @@ if polyrun_cov_measure
 end
 
 require "active_job"
+# good_job >= 4.24 Configuration::Validator includes ActiveModel::Model
+require "active_model"
 require "good_job"
 
 require "sentry-ruby"

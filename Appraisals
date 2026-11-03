@@ -1,21 +1,21 @@
 appraise "ruby34" do
   ruby ">= 3.4.0"
-  gem "sentry-ruby", "~> 7.0.0"
+  gem "sentry-ruby", "~> 7.2.0"
 end
 
 appraise "rails8" do
   ruby ">= 3.2.0"
   gem "rails", "~> 8.0.4", ">= 8.0.4.1"
-  gem "rack", ">= 3.2.6"
+  gem "rack", ">= 3.2.8"
   gem "loofah", ">= 2.25.2"
-  gem "crass", ">= 1.0.7"
+  gem "crass", ">= 1.0.8"
   gem "erb", ">= 6.0.4"
   gem "concurrent-ruby", ">= 1.3.7"
   gem "nokogiri", ">= 1.19.4"
   gem "rack-session", ">= 2.1.2"
   gem "rails-html-sanitizer", ">= 1.7.1"
-  gem "good_job", "~> 4.0"
+  gem "good_job", "~> 4.24"
   gem "sqlite3", "~> 2.1"
-  gem "sentry-ruby", "~> 7.0.0"
-  gem "sentry-rails", "~> 7.0.0"
+  gem "sentry-ruby", "~> 7.2.0"
+  gem "sentry-rails", "~> 7.2.0"
 end
