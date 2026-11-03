@@ -211,6 +211,14 @@ GEM
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
+    sqlite3 (2.10.2-aarch64-linux-gnu)
+    sqlite3 (2.10.2-aarch64-linux-musl)
+    sqlite3 (2.10.2-arm-linux-gnu)
+    sqlite3 (2.10.2-arm-linux-musl)
+    sqlite3 (2.10.2-arm64-darwin)
+    sqlite3 (2.10.2-x86_64-darwin)
+    sqlite3 (2.10.2-x86_64-linux-gnu)
+    sqlite3 (2.10.2-x86_64-linux-musl)
     standard (1.52.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -266,6 +274,7 @@ DEPENDENCIES
   rubocop-rspec (~> 3.8)
   rubocop-thread_safety (~> 0.7)
   sentry-good_job!
+  sqlite3 (>= 2.9.6)
   standard (~> 1.52)
   standard-custom (~> 1.0)
   standard-performance (~> 1.8)

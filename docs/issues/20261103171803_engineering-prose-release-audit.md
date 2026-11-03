@@ -22,6 +22,7 @@ Ranked fixes applied:
 3. Duplicate cron setup examples collapsed (medium, observed).
 4. Unreachable `_sentry_set_span_data` `super` branch removed (high, observed; Concern include on ActiveJob::Base).
 5. README, CHANGELOG, and ASCII punctuation pass (house prose).
+6. Root Gemfile gains sqlite3 so default-bundle integration runs.
 
 Deferred:
 

@@ -20,6 +20,7 @@ Ranked fixes applied:
 4. Collapse duplicate cron-setup examples in `good_job_spec` (medium confidence, observed).
 5. Remove unreachable `_sentry_set_span_data` `super` branch: after Concern include on `ActiveJob::Base`, a class override shadows the helper and Concern blocks prepend (high confidence, observed in session).
 6. README and CHANGELOG prose pass; ASCII dashes in `spec/README.md` and junit formatter comment.
+7. Add `sqlite3` (>= 2.9.6) to the root Gemfile so default-bundle `spec/integration` runs (was pending forever).
 
 Deferred:
 
@@ -30,7 +31,7 @@ Checks observed in this session:
 
 - bundle exec rubocop on touched Ruby files: 5 files, no offenses.
 - POLYRUN_COVERAGE=1 bundle exec polyrun parallel-rspec --workers 5 --merge-failures: exit 0; coverage/merged-summary.txt 98.09% lines (205 / 209) across 6 files.
-- bundle exec rspec spec/integration: 1 pending (sqlite3 unavailable), 0 failures.
+- bundle exec rspec spec/integration: 1 example, 0 failures (after root Gemfile sqlite3).
 - gem build sentry-good_job.gemspec and Gem::Package#verify for 7.0.3: ok.
 - Cold require under bundler: wall 0.355 s, RSS after 52,887,552 bytes, RSS delta 36,618,240 bytes. Single-machine observation, not a release budget.
 
