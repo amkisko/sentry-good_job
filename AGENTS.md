@@ -108,7 +108,9 @@ Stop until one of these applies before adding a dependency:
 
 Run dependency-audit for direct dependency changes, graph audits, releases with hot-path package changes, and plausible dependency vulnerability or exploitation signals found during ordinary work. Keep the evidence and assessment in the live-work or dependency record.
 
-Related: `dependency-issues` records upstream defects found during real work; `minimal-implementation` covers YAGNI before adding deps; `engineering-audit` covers code and pipeline review.
+On resolved lockfile graph or runtime-pin upgrades (automated or human), gather before/after resource samples for install or graph storage, resident memory, CPU or a stated proxy, and shipped bundle or image size when the product ships bytes. The reviewing agent uses isolated checkouts and the same small consumer-owned measurement commands for both revisions. It reports the comparison and writes to a change request only when authorized. Cheaper or smaller without comparable samples is inference. Continuous absolute ship-path ceilings stay in `delivery-budgets`.
+
+Related: `dependency-issues` records upstream defects found during real work; `minimal-implementation` covers YAGNI before adding deps; `engineering-audit` covers code and pipeline review; `delivery-budgets` owns continuous size and build-timing gates.
 <!-- pray:3ac5d6ce -->
 
 <!-- pray:bf80d00f -->
@@ -156,7 +158,7 @@ Not optional even when minimizing scope:
 - anything explicitly requested in the task or ticket;
 - tests for non-trivial behavior per @spec/README.md; trivial one-liners need no new spec.
 
-Related: `keep-the-work` covers the failed place after a refusal; `dependency-policy` covers third-party registry packages; `infer-conventions` encodes how this tree writes as checks.
+Related: `preferred-stack` covers native-first language choice and proximity when no tree language owns the path yet; `keep-the-work` covers the failed place after a refusal; `dependency-policy` covers third-party registry packages; `infer-conventions` encodes how this tree writes as checks.
 <!-- pray:bf7304a6 -->
 
 <!-- pray:120c3507 -->
@@ -190,16 +192,18 @@ Examples:
 - `trunk/2026-august-pack`
 - `plan/auth-redesign-notes`
 - `plan/2026-q2-roadmap`
+
+Related: `planned-release` names commitment, collection period, period label, and prepare/deliver events; its skill owns defaults, binding, and process signals. The `trunk/<title>` prefix names a candidate branch. The stable line is a separate role.
 <!-- pray:26f3566a -->
 
 <!-- pray:f528eeca -->
 ## Preferred stack and tools
 
-- native-first approach for all platforms and languages
-- ruby for web application and API development, and for its rich ecosystem of libraries and frameworks
-- elixir for concurrent and distributed systems, and for its actor model and fault tolerance
-- rust for system programming and performance-critical code
-- javascript, html, css for native browser experience
+- native-first means: name the nearest semantic authority for the job (CPU and OS ABI, browser host, language runtime, database engine, GPU pipeline, build or cluster orchestrator, game or media engine, and similar), then prefer a language whose ordinary execution form lives there
+- a portable sandbox, managed VM guest, or engine guest is not OS-native when the job is that host's contract
+- match the language of the directory you are changing; follow the matching language pack when the project composes one
+- when starting a new tree or an independent package with no owning language yet, choose by nearest authority and proximity band; ask only when two candidates sit in the same band and the choice changes the outcome; record language, authority, band, and why not a closer option
+- house shortcuts when proximity and team practice agree: ruby for web application and API work; elixir for concurrent and distributed systems on the BEAM; rust for system programming and performance-critical native code; javascript, html, css for the browser document and style surface
 - humane and accessible visual-surface principles for UI/UX, and for clear communication of intent and feedback; label icon-only controls; hide decorative duplicates from the accessibility tree
 - when the change presents a screen, document, or other person-facing surface, name that surface in the work product (reply, pull request, live-work note) and record a visual assessment: hierarchy, copy, interactive states, empty/loading/error, a narrow surface, and whether a person can finish the task; record what was assessed and what remains for a human; skip and say so when there is no such surface
 - pictures, previews, tickets, and chat threads are source locators for that signal; the assessment is the running product plus the written need
@@ -209,7 +213,7 @@ Examples:
 - catalog assignment starts empty when a default first row would apply a change
 - a command that writes a record must look like a command
 
-Related: `keep-the-work` covers staying on the failed place after a refusal.
+Related: the `preferred-stack` skill owns proximity bands and the selection procedure; `minimal-implementation` keeps scope small and repeats the tree-language match; language packs (`ruby-conventions`, `rust-conventions`, `elixir-conventions`, `kotlin-conventions`) own how to write after the choice; `keep-the-work` covers staying on the failed place after a refusal.
 <!-- pray:f528eeca -->
 
 <!-- pray:d3b0d939 -->
