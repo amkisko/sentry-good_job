@@ -7,6 +7,7 @@
 - Drop the futile `skippable_job_adapters` example that never asserted production behavior
 - Simplify `_sentry_set_span_data` by removing an unreachable `super` branch after Concern include on `ActiveJob::Base`
 - Add `sqlite3` to the root Gemfile so `spec/integration` runs under the default bundle
+- Sync appraisal lockfiles after the path-gem version bump; run `appraisal install` in release
 
 ## 7.0.2 (2026-10-30)
 

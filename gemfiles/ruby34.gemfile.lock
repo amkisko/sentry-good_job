@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    sentry-good_job (7.0.2)
+    sentry-good_job (7.0.3)
       good_job (>= 3.0, < 5.0)
       sentry-ruby (>= 7.0, < 8.0)
 
@@ -201,6 +201,8 @@ GEM
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
       logger
+    sqlite3 (2.10.2-arm64-darwin)
+    sqlite3 (2.10.2-x86_64-linux-gnu)
     standard (1.56.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -250,6 +252,7 @@ DEPENDENCIES
   rubocop-thread_safety (~> 0.7)
   sentry-good_job!
   sentry-ruby (~> 7.0.0)
+  sqlite3 (>= 2.9.6)
   standard (~> 1.52)
   standard-custom (~> 1.0)
   standard-performance (~> 1.8)

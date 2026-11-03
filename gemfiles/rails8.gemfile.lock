@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    sentry-good_job (7.0.2)
+    sentry-good_job (7.0.3)
       good_job (>= 3.0, < 5.0)
       sentry-ruby (>= 7.0, < 8.0)
 
@@ -309,9 +309,9 @@ GEM
     tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    unicode-display_width (3.2.0)
-      unicode-emoji (~> 4.1)
-    unicode-emoji (4.1.0)
+    unicode-display_width (3.3.0)
+      unicode-emoji (~> 4.3)
+    unicode-emoji (4.3.0)
     uri (1.1.1)
     useragent (0.16.11)
     websocket-driver (0.8.2)

@@ -21,6 +21,7 @@ Ranked fixes applied:
 5. Remove unreachable `_sentry_set_span_data` `super` branch: after Concern include on `ActiveJob::Base`, a class override shadows the helper and Concern blocks prepend (high confidence, observed in session).
 6. README and CHANGELOG prose pass; ASCII dashes in `spec/README.md` and junit formatter comment.
 7. Add `sqlite3` (>= 2.9.6) to the root Gemfile so default-bundle `spec/integration` runs (was pending forever).
+8. Sync `gemfiles/*.gemfile.lock` to path gem 7.0.3; run `appraisal install` in release (CI frozen mode failed without this).
 
 Deferred:
 
