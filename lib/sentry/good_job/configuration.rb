@@ -13,7 +13,9 @@ module Sentry
   module GoodJob
     IGNORE_DEFAULT = [
       "ActiveJob::DeserializationError",
-      "ActiveJob::SerializationError"
+      "ActiveJob::SerializationError",
+      "GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError",
+      "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"
     ]
 
     class Configuration

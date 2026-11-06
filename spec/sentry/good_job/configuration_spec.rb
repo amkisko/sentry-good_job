@@ -19,7 +19,9 @@ RSpec.describe Sentry::GoodJob::Configuration do
     it "includes expected exceptions" do
       expect(Sentry::GoodJob::IGNORE_DEFAULT).to include(
         "ActiveJob::DeserializationError",
-        "ActiveJob::SerializationError"
+        "ActiveJob::SerializationError",
+        "GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError",
+        "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"
       )
     end
   end

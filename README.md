@@ -161,7 +161,7 @@ When performance monitoring is enabled:
 - Job execution time (sentry-rails / Sentry spans)
 - Queue latency on this gem's enqueue-span fallback (skipped when sentry-rails `record_producer_span` is present)
 - Retry counts
-- Good Job context fields: queue name, executions, priority
+- Good Job context fields: queue name, executions, priority, labels, concurrency key (legacy)
 
 ## Error Context
 
@@ -169,12 +169,16 @@ Merged into error reports:
 
 - Job class name, job ID, locale, scheduled_at (sentry-rails)
 - Queue name, execution count, priority, enqueued_at (this gem under `good_job`)
+- Labels when the job responds to `good_job_labels` (Good Job v5 concurrency identity)
+- Concurrency key when present on older Good Job 4.x jobs
 - Job arguments when `config.data_collection.queues` is enabled
+
+Concurrency and throttle exceeded errors are excluded by default (`IGNORE_DEFAULT`).
 
 ## Compatibility
 
 - Ruby 3.4+
-- Good Job 3.x and 4.x
+- Good Job 3.x, 4.x, and 5.x
 - Sentry Ruby SDK 7.x
 
 ## Contributing

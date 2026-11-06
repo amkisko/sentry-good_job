@@ -43,7 +43,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "sentry-ruby", ">= 7.0", "< 8.0"
-  spec.add_dependency "good_job", ">= 3.0", "< 5.0"
+  spec.add_dependency "good_job", ">= 3.0", "< 6.0"
 
   spec.add_development_dependency "appraisal", "~> 2"
   spec.add_development_dependency "bundler", ">= 2"

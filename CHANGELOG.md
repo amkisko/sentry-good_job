@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.1.0 (2026-11-06)
+
+- Add `labels` and legacy `concurrency_key` to `good_job` error context when present
+- Exclude Good Job concurrency and throttle exceeded errors from reporting by default
+- Allow `good_job` 5.x (`>= 3.0`, `< 6.0`)
+
 ## 7.0.3 (2026-11-03)
 
 - Remove unwired `ActiveJobExtensions.enhance_sentry_tags` (no sentry-rails tags hook)

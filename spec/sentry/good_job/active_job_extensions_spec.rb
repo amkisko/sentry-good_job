@@ -10,12 +10,26 @@ RSpec.describe Sentry::GoodJob::ActiveJobExtensions do
 
   describe ".enhance_sentry_context" do
     it "adds GoodJob data when job exposes GoodJob attributes", :aggregate_failures do
-      job = Struct.new(:queue_name, :executions, :enqueued_at, :priority).new("default", 2, Time.utc(2024, 1, 1), 5)
+      job = Struct.new(
+        :queue_name,
+        :executions,
+        :enqueued_at,
+        :priority,
+        :good_job_labels,
+        :good_job_concurrency_key
+      ).new("default", 2, Time.utc(2024, 1, 1), 5, ["email"], "legacy-key")
       base = {foo: "bar"}
 
       result = described_class.enhance_sentry_context(job, base)
 
-      expect(result[:good_job]).to include(queue_name: "default", executions: 2, enqueued_at: Time.utc(2024, 1, 1), priority: 5)
+      expect(result[:good_job]).to include(
+        queue_name: "default",
+        executions: 2,
+        enqueued_at: Time.utc(2024, 1, 1),
+        priority: 5,
+        labels: ["email"],
+        concurrency_key: "legacy-key"
+      )
       expect(result[:foo]).to eq("bar")
     end
 
