@@ -163,7 +163,7 @@ GEM
     parser (3.3.10.0)
       ast (~> 2.4.1)
       racc
-    polyrun (2.2.1)
+    polyrun (2.2.9)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -339,7 +339,7 @@ DEPENDENCIES
   good_job (~> 4.24)
   loofah (>= 2.25.2)
   nokogiri (>= 1.19.4)
-  polyrun (>= 2.2.0)
+  polyrun (>= 2.2.9)
   rack (>= 3.2.8)
   rack-session (>= 2.1.2)
   rails (~> 8.0.4, >= 8.0.4.1)
