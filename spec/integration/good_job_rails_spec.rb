@@ -191,24 +191,14 @@ RSpec.describe "Rails + GoodJob integration" do
     Sentry::GoodJob.setup_good_job_integration
   end
 
-  it "captures a GoodJob job with GoodJob context/tags and cron monitoring", :aggregate_failures do
+  it "captures a GoodJob job with GoodJob context and cron monitoring", :aggregate_failures do
     transport = Sentry.get_current_client.transport
     HappyJobWithCron.perform_later
 
     expect(transport.events.length).to be >= 1
-    extract_tags = lambda do |e|
-      return e[:tags] || e["tags"] if e.is_a?(Hash) && (e[:tags] || e["tags"])
-      if e.respond_to?(:to_hash)
-        h = e.to_hash
-        return h[:tags] || h["tags"] if h
-      end
-      return e.tags if e.respond_to?(:tags)
-      nil
-    end
 
     event = transport.events.reverse.find do |e|
-      tags = extract_tags.call(e)
-      tags.present? || (e.respond_to?(:message) && e.message.present?) ||
+      (e.respond_to?(:message) && e.message.present?) ||
         (e.is_a?(Hash) && (e[:message] || e["message"])) ||
         (e.respond_to?(:to_hash) && (e.to_hash[:message] || e.to_hash["message"]))
     end
@@ -217,10 +207,19 @@ RSpec.describe "Rails + GoodJob integration" do
       skip "No GoodJob events captured (likely only check-ins present)"
     end
 
-    tags = extract_tags.call(event)
-    if tags.present?
-      expect(tags).to include(:queue_name, :executions)
-    end
+    contexts =
+      if event.respond_to?(:contexts)
+        event.contexts
+      elsif event.respond_to?(:to_hash)
+        hash = event.to_hash
+        hash.is_a?(Hash) ? (hash[:contexts] || hash["contexts"] || {}) : {}
+      elsif event.is_a?(Hash)
+        event[:contexts] || event["contexts"] || {}
+      else
+        {}
+      end
+    good_job_context = contexts[:good_job] || contexts["good_job"]
+    expect(good_job_context).to include(:queue_name, :executions).or include("queue_name", "executions") if good_job_context
 
     event_message =
       if event.respond_to?(:message)

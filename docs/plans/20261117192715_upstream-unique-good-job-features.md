@@ -12,19 +12,17 @@ Do this before upstream feature PRs and before any deprecation release.
 
 Goals:
 
-- Stay compatible with published `sentry-ruby` / `sentry-rails` 7.2.0.
-- Prove compatibility against current getsentry `master` (job-extension path after #3130 and related commits, plus #3199 / #3200), using a path or git pin in CI or a local matrix cell.
+- Stay compatible with published `sentry-ruby` / `sentry-rails` 7.3.0 (includes official `:good_job_cron` and the job-extension ActiveJob path).
 - Keep this gem's cron path, IGNORE defaults, and Good Job context helpers working. Do not add deprecation warnings or README "use official instead" cutover yet.
 
-Likely work in this repo:
+Work in this repo (Step 0 in progress / landing with 7.3 absorb):
 
-- Gate or replace `SentryReporter.sentry_context` monkeypatch: that method exists on 7.2.0 and is gone on master. Prefer duck-typing / job-extension hooks so setup does not raise.
+- Gate `SentryReporter.sentry_context` monkeypatch: only when the method exists (7.2); skip on 7.3+.
+- Prepend `RailsActiveJobExtension` onto `Sentry::Rails::ActiveJobExtension` when that class exists (7.3+).
 - Keep enqueue-span fallback skipped when `record_producer_span` exists.
-- Relock appraisal / Gemfile pins as needed within `sentry-ruby >= 7.0, < 8.0`.
-- Add or extend specs that fail on master today if the context enhance path is unbound.
-- Document dual-enable risk only as an operator note if useful (`:good_job` here vs `:good_job_cron` official), not as a deprecation.
+- Relock appraisal pins to `~> 7.3.0` within gemspec `sentry-ruby >= 7.0, < 8.0`.
 
-Exit criteria: green tests on 7.2.0 and on a master-pinned sentry-rails cell; gem still presented as the supported Good Job add-on for hosts that need it.
+Exit criteria: green tests on 7.3.0 appraisal cells; gem still presented as the supported Good Job add-on for hosts that need it.
 
 ## Scope (later upstream proposals)
 

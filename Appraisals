@@ -1,6 +1,6 @@
 appraise "ruby34" do
   ruby ">= 3.4.0"
-  gem "sentry-ruby", "~> 7.2.0"
+  gem "sentry-ruby", "~> 7.3.0"
 end
 
 appraise "rails8" do
@@ -16,6 +16,6 @@ appraise "rails8" do
   gem "rails-html-sanitizer", ">= 1.7.1"
   gem "good_job", "~> 4.24"
   gem "sqlite3", "~> 2.1"
-  gem "sentry-ruby", "~> 7.2.0"
-  gem "sentry-rails", "~> 7.2.0"
+  gem "sentry-ruby", "~> 7.3.0"
+  gem "sentry-rails", "~> 7.3.0"
 end

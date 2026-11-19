@@ -20,6 +20,7 @@ module Sentry
         if defined?(::Sentry::Rails::ActiveJobExtensions::SentryReporter)
           enhance_sentry_reporter
         end
+        register_rails_active_job_extension
 
         # Set up GoodJob-specific ActiveJob extensions
         setup_good_job_extensions
@@ -28,8 +29,11 @@ module Sentry
       def self.enhance_sentry_reporter
         return if defined?(@reporter_enhanced) && @reporter_enhanced
 
-        # Enhance the sentry_context method in SentryReporter
-        ::Sentry::Rails::ActiveJobExtensions::SentryReporter.class_eval do
+        reporter = ::Sentry::Rails::ActiveJobExtensions::SentryReporter
+        # sentry-rails 7.3 removed SentryReporter.sentry_context in favor of job extensions.
+        return unless reporter.respond_to?(:sentry_context)
+
+        reporter.class_eval do
           class << self
             alias_method :original_sentry_context, :sentry_context
 
@@ -41,6 +45,15 @@ module Sentry
         end
 
         @reporter_enhanced = true
+      end
+
+      def self.register_rails_active_job_extension
+        return if defined?(@job_extension_registered) && @job_extension_registered
+        return unless defined?(::Sentry::Rails::ActiveJobExtension)
+
+        require "sentry/good_job/rails_active_job_extension" unless defined?(RailsActiveJobExtension)
+        RailsActiveJobExtension.install!
+        @job_extension_registered = true
       end
 
       def self.setup_good_job_extensions
@@ -57,7 +70,7 @@ module Sentry
         end
       end
 
-      private_class_method :enhance_sentry_reporter, :setup_good_job_extensions
+      private_class_method :enhance_sentry_reporter, :register_rails_active_job_extension, :setup_good_job_extensions
 
       # GoodJob-specific extensions for ActiveJob
       module GoodJobExtensions

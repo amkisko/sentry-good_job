@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.2.0 (2026-11-19)
+
+- Support `sentry-ruby` / `sentry-rails` 7.3 (gate removed `SentryReporter.sentry_context`, prepend Good Job context onto ActiveJob extension)
+- Pin appraisal matrix to `~> 7.3.0`
+
 ## 7.1.0 (2026-11-06)
 
 - Add `labels` and legacy `concurrency_key` to `good_job` error context when present

@@ -106,6 +106,11 @@ RSpec.describe Sentry::GoodJob::ActiveJobExtensions do
   end
 
   describe ".setup" do
+    before do
+      described_class.remove_instance_variable(:@reporter_enhanced) if described_class.instance_variable_defined?(:@reporter_enhanced)
+      described_class.remove_instance_variable(:@job_extension_registered) if described_class.instance_variable_defined?(:@job_extension_registered)
+    end
+
     it "returns when Sentry is not initialized" do
       allow(Sentry).to receive(:initialized?).and_return(false)
       allow(ActiveSupport).to receive(:on_load)
@@ -150,6 +155,50 @@ RSpec.describe Sentry::GoodJob::ActiveJobExtensions do
       expect(context[:good_job]).to include(:queue_name, :executions)
       # GoodJob extensions included into Active Job
       expect(job_class.ancestors).to include(Sentry::GoodJob::ActiveJobExtensions::GoodJobExtensions)
+    end
+
+    it "does not raise when sentry-rails 7.3 reporter has no sentry_context" do
+      perform_basic_setup
+      allow(Sentry).to receive(:initialized?).and_return(true)
+
+      stub_const("Rails", Module.new)
+      Rails.singleton_class.define_method(:application) { nil }
+
+      reporter = Class.new
+      stub_const("Sentry::Rails::ActiveJobExtensions", Module.new)
+      stub_const("Sentry::Rails::ActiveJobExtensions::SentryReporter", reporter)
+
+      allow(ActiveSupport).to receive(:on_load)
+
+      expect { described_class.setup }.not_to raise_error
+    end
+
+    it "prepends GoodJob context onto sentry-rails ActiveJobExtension when present", :aggregate_failures do
+      perform_basic_setup
+      allow(Sentry).to receive(:initialized?).and_return(true)
+
+      stub_const("Rails", Module.new)
+      Rails.singleton_class.define_method(:application) { nil }
+
+      extension_class = Class.new do
+        def active_job_error_data(_job)
+          {contexts: {}, tags: {}, extra: {}}
+        end
+
+        def apply_active_job_context(_scope, _job)
+        end
+      end
+
+      stub_const("Sentry::Rails", Module.new)
+      stub_const("Sentry::Rails::ActiveJobExtension", extension_class)
+      stub_const("Sentry::Rails::ActiveJobExtensions", Module.new)
+      stub_const("Sentry::Rails::ActiveJobExtensions::SentryReporter", Class.new)
+
+      allow(ActiveSupport).to receive(:on_load)
+
+      described_class.setup
+
+      expect(extension_class.ancestors).to include(Sentry::GoodJob::RailsActiveJobExtension)
     end
 
     it "does not wrap enqueue when sentry-rails already records the producer span" do

@@ -33,12 +33,12 @@
 - Breakage risk against post-7.2.0 sentry-rails master: job-extension refactor (#3130 and related commits) removes `SentryReporter.sentry_context`. This gem's `alias_method :original_sentry_context, :sentry_context` will fail at setup against that API. Confirmed present on tag `7.2.0`, absent on current `sentry-rails/lib/sentry/rails/active_job.rb` on master.
 - Slug migration risk: this gem uses `underscore` + strip trailing `_job`; official uses `Sentry::Cron::Slug.from(cron_key)` (downcase, non-alnum to `-`, max length). Existing monitors may not match after switch.
 - Official skips automatic cron check-ins when the job class already includes `Sentry::Cron::MonitorCheckIns::Patch`, so a host that keeps this gem's class patch will keep this gem's check-in path for those jobs.
-- Rubygems evidence at analysis time: `sentry-good_job` 7.1.0, ~8909 total downloads; latest published `sentry-rails` / `sentry-ruby` 7.2.0 does not yet contain #3200.
+- Rubygems: `sentry-ruby` / `sentry-rails` 7.3.0 published and includes #3200. This gem absorb work lands on branch `patch/absorb-sentry-ruby-7-3` (gate `sentry_context`, register `:good_job` ActiveJob extension, appraisal `~> 7.3.0`).
 
 ## Next
 
-- First: absorb latest sentry-ruby / sentry-rails in this gem per `docs/plans/20261117192715_upstream-unique-good-job-features.md` Step 0 (compat with 7.2.0 and master pin; fix or gate `sentry_context`; no deprecation yet).
-- Then follow that plan: keep #2750 separate; open IGNORE PR; open context issue then PR; wait for #3200 on Rubygems; deprecate this gem only after that. PRs slim, Ruby-core and sentry-ruby shaped, RFC-style description.
+- Finish/merge Step 0 absorb (`patch/absorb-sentry-ruby-7-3`); no deprecation in that release.
+- Then follow the plan: keep #2750 / #3215 separate; open IGNORE PR for #3216; context PR after signal on #3217; deprecate this gem only after migration guidance for hosts on official `:good_job_cron`.
 - If durable gaps are not upstreamed before deprecation ends, accept that retirement drops them.
 - After migration window: yank guidance to remove the gem; archive or mark the repo read-only.
 
