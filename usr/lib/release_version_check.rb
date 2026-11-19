@@ -46,37 +46,37 @@ module ReleaseVersionCheck
     end
   end
 
-# Body under the version heading until the next ## heading (heading line omitted).
-def changelog_notes_for(version, path: "CHANGELOG.md")
-  return nil unless File.file?(path)
+  # Body under the version heading until the next ## heading (heading line omitted).
+  def changelog_notes_for(version, path: "CHANGELOG.md")
+    return nil unless File.file?(path)
 
-  collecting = false
-  body = +""
-  File.foreach(path, encoding: "UTF-8") do |line|
-    if collecting
-      break if line.start_with?("## ")
+    collecting = false
+    body = +""
+    File.foreach(path, encoding: "UTF-8") do |line|
+      if collecting
+        break if line.start_with?("## ")
 
-      body << line
-      next
+        body << line
+        next
+      end
+
+      next if line.match?(/Unreleased/i)
+
+      collecting = true if changelog_line_has_version?(line, version)
     end
+    return nil unless collecting
 
-    next if line.match?(/Unreleased/i)
-
-    collecting = true if changelog_line_has_version?(line, version)
+    notes = body.strip
+    notes.empty? ? nil : "#{notes}\n"
   end
-  return nil unless collecting
 
-  notes = body.strip
-  notes.empty? ? nil : "#{notes}\n"
-end
+  def require_changelog_notes!(version:, path: "CHANGELOG.md")
+    notes = changelog_notes_for(version, path: path)
+    return notes if notes
 
-def require_changelog_notes!(version:, path: "CHANGELOG.md")
-  notes = changelog_notes_for(version, path: path)
-  return notes if notes
-
-  abort "#{RED}release requires #{path} notes under ## #{version} " \
-        "(non-empty body before the next ## heading)#{NC}"
-end
+    abort "#{RED}release requires #{path} notes under ## #{version} " \
+          "(non-empty body before the next ## heading)#{NC}"
+  end
 
   def changelog_includes_version?(version, path: "CHANGELOG.md")
     return false unless File.file?(path)

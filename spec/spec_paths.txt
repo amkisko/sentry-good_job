@@ -5,4 +5,5 @@ spec/sentry/good_job/configuration_spec.rb
 spec/sentry/good_job/context_helpers_spec.rb
 spec/sentry/good_job/cron_helpers_spec.rb
 spec/sentry/good_job/integration_spec.rb
+spec/sentry/good_job/rails_active_job_extension_spec.rb
 spec/sentry/good_job_spec.rb
